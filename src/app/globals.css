@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* Thème Tailwind v4 : lie les variables aux utilitaires (bg-primary, border-border, etc.) */
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -25,6 +24,15 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Marquee : animation défilement infini */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-33.333%); }
+}
+.animate-marquee {
+  animation: marquee-scroll 25s linear infinite;
 }
 
 @layer base {
@@ -79,13 +87,11 @@
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    @apply border-border;
   }
 
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    @apply font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', sans-serif;
   }
 }

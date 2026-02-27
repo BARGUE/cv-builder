@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { loginApi, registerApi } from "@/src/services/auth/api";
-import type { AuthRouteBody } from "@/src/services/auth/types";
+import type { AuthCredentials, AuthRouteBody } from "@/src/services/auth/types";
 
 export async function POST(req: Request) {
     let body: AuthRouteBody;
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
         );
     }
 
-    const { action, email, password } = body;
+    const { action, email, password, firstName, lastName } = body;
     const trimmedEmail = typeof email === "string" ? email.trim() : "";
 
     if (!trimmedEmail || !password) {
@@ -23,7 +23,19 @@ export async function POST(req: Request) {
         );
     }
 
-    const credentials = { email: trimmedEmail, password };
+    const credentials: AuthCredentials = { email: trimmedEmail, password };
+    if (action === "register") {
+        const trimmedFirst = typeof firstName === "string" ? firstName.trim() : "";
+        const trimmedLast = typeof lastName === "string" ? lastName.trim() : "";
+        if (!trimmedFirst || !trimmedLast) {
+            return NextResponse.json(
+                { error: "Prénom et nom requis pour l'inscription" },
+                { status: 400 }
+            );
+        }
+        credentials.firstName = trimmedFirst;
+        credentials.lastName = trimmedLast;
+    }
 
     try {
         const result =

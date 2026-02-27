@@ -1,6 +1,8 @@
 export interface AuthCredentials {
     email: string;
     password: string;
+    firstName?: string;
+    lastName?: string;
 }
 
 export interface AuthApiResponse {
@@ -31,7 +33,8 @@ export interface MeResponse {
 
 interface Profile {
     id: string;
-    fullName: string | null;
+    firstName: string | null;
+    lastName: string | null;
     avatarUrl: string | null;
     createdAt?: string;
     updatedAt?: string;

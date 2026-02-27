@@ -2,173 +2,30 @@
 
 import Link from "next/link";
 import { Button } from "@/src/components/ui/button";
-import { FileText, ArrowRight, ArrowUpRight, Palette, Zap, Shield, UserPlus, PenLine, LayoutGrid, Download } from "lucide-react";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
-import { useRef } from "react";
+import { FileText, ArrowRight, Zap, LayoutGrid, Download } from "lucide-react";
+import { motion } from "framer-motion";
+import { InView } from "../components/home/InView";
+import { LandingNav } from "../components/home/LandingNav";
+import { HeroSection } from "../components/home/HeroSection";
+import { LandingFooter } from "../components/home/LandingFooter";
+import { fadeUp } from "../components/home/animations";
 
-/* ─── Animation helpers ─── */
-const fadeUp = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" as const } },
-};
-
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
-};
-
-function InView({ children, className }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-  return (
-    <motion.div ref={ref} initial="hidden" animate={inView ? "visible" : "hidden"} variants={stagger} className={className}>
-      {children}
-    </motion.div>
-  );
-}
-
-/* ─── Nav ─── */
-function Nav() {
-  return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border/40">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="h-7 w-7 rounded-md bg-primary flex items-center justify-center">
-            <FileText className="h-3.5 w-3.5 text-primary-foreground" />
-          </div>
-          <span className="text-sm font-semibold tracking-tight">CVBuilder</span>
-        </Link>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground text-sm" asChild>
-            <Link href="/auth/login">Connexion</Link>
-          </Button>
-          <Button size="sm" className="rounded-full px-5 text-sm" asChild>
-            <Link href="/auth/login">Commencer →</Link>
-          </Button>
-        </div>
-      </div>
-    </nav>
-  );
-}
-
-/* ─── Hero ─── */
-function Hero() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [0, 80]);
-  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
-
-  return (
-    <section ref={ref} className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-      {/* Grid bg */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-          backgroundSize: "60px 60px",
-        }}
-      />
-      {/* Blob */}
-      <motion.div
-        className="absolute top-1/3 right-1/4 w-[500px] h-[500px] rounded-full opacity-[0.07]"
-        style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)" }}
-        animate={{ scale: [1, 1.15, 1], x: [0, 30, 0] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      <motion.div style={{ y, opacity }} className="relative max-w-7xl mx-auto px-6 pt-28 pb-20">
-        <motion.div initial="hidden" animate="visible" variants={stagger}>
-          {/* Tag */}
-          <motion.div variants={fadeUp}>
-            <span className="inline-flex items-center gap-2 text-xs font-medium tracking-widest uppercase text-primary mb-10">
-              <span className="h-px w-6 bg-primary inline-block" />
-              Gratuit · Sans engagement
-            </span>
-          </motion.div>
-
-          {/* Headline */}
-          <motion.h1 className="text-[clamp(3rem,9vw,8rem)] font-black tracking-tighter leading-[0.9] text-foreground" variants={stagger}>
-            <motion.span variants={fadeUp} className="block">Votre CV,</motion.span>
-            <motion.span variants={fadeUp} className="block">
-              <span className="text-primary">sans</span> effort.
-            </motion.span>
-          </motion.h1>
-
-          {/* Sub + CTA */}
-          <div className="mt-12 flex flex-col md:flex-row md:items-end gap-8 md:gap-16">
-            <motion.p variants={fadeUp} className="text-muted-foreground text-lg max-w-xs leading-relaxed">
-              6 templates pros, aperçu temps réel, export PDF. Prêt en 5 minutes.
-            </motion.p>
-            <motion.div variants={fadeUp} className="flex items-center gap-4">
-              <Button size="lg" className="h-14 px-8 rounded-full text-base font-semibold" asChild>
-                <Link href="/auth/register">
-                  Créer mon CV
-                  <motion.span
-                    className="ml-2 inline-block"
-                    animate={{ x: [0, 4, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                    <ArrowRight className="h-4 w-4" />
-                  </motion.span>
-                </Link>
-              </Button>
-              <Link href="/auth/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4">
-                J&apos;ai déjà un compte
-              </Link>
-            </motion.div>
-          </div>
-
-          {/* Stat chips */}
-          <motion.div variants={fadeUp} className="mt-16 flex flex-wrap gap-3">
-            {[
-              { val: "6", label: "templates" },
-              { val: "100%", label: "gratuit" },
-              { val: "5 min", label: "pour créer" },
-            ].map(({ val, label }) => (
-              <div key={label} className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm">
-                <span className="font-bold text-primary">{val}</span>
-                <span className="text-muted-foreground">{label}</span>
-              </div>
-            ))}
-          </motion.div>
-        </motion.div>
-      </motion.div>
-
-      {/* Scroll indicator */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-      >
-        <span className="text-[10px] tracking-widest uppercase text-muted-foreground">Scroll</span>
-        <motion.div
-          className="w-px h-8 bg-border origin-top"
-          animate={{ scaleY: [0, 1, 0] }}
-          transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </motion.div>
-    </section>
-  );
-}
-
-/* ─── Marquee ─── */
+/* ─── Marquee (infinite scroll) ─── */
 function Marquee() {
   const items = ["Classic", "Modern", "Creative", "Compact", "Executive", "Sidebar", "Export PDF", "Photo profil", "Compétences", "Langues"];
   return (
-    <div className="border-y border-border py-4 overflow-hidden bg-muted/20">
-      <motion.div
-        className="flex gap-10 whitespace-nowrap"
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-      >
-        {[...items, ...items].map((item, i) => (
-          <span key={i} className="text-sm font-medium text-muted-foreground flex items-center gap-3">
-            <span className="text-primary">✦</span>
-            {item}
+    <div className="relative overflow-hidden bg-background py-5 border-y border-border">
+      {/* Fade edges */}
+      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-background to-transparent z-10" />
+      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-background to-transparent z-10" />
+      <div className="flex w-max min-w-max shrink-0 animate-marquee">
+        {[...items, ...items, ...items].map((item, i) => (
+          <span key={i} className="flex items-center gap-3 mx-6">
+            <span className="text-primary text-xs">✦</span>
+            <span className="text-sm font-semibold tracking-wide text-muted-foreground/60 uppercase">{item}</span>
           </span>
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -179,14 +36,13 @@ function AppMockup() {
     <section className="max-w-7xl mx-auto px-6 py-24">
       <InView>
         <motion.div variants={fadeUp} className="text-center mb-4">
-          <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground">L&apos;éditeur</span>
+          <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground">L'éditeur</span>
         </motion.div>
         <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl font-black tracking-tighter text-center mb-16">
           Tout en un seul endroit.
         </motion.h2>
 
         <motion.div variants={fadeUp} className="rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
-          {/* Window chrome */}
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/40">
             <div className="flex gap-1.5">
               {["bg-red-400", "bg-yellow-400", "bg-green-400"].map((c, i) => (
@@ -200,9 +56,7 @@ function AppMockup() {
             </div>
           </div>
 
-          {/* App interior */}
           <div className="grid grid-cols-5 min-h-[320px] md:min-h-[400px]">
-            {/* Left panel */}
             <div className="col-span-2 border-r border-border p-6 space-y-5 bg-background">
               <div className="flex items-center gap-2 mb-6">
                 <div className="h-6 w-6 rounded bg-primary/10 flex items-center justify-center">
@@ -229,7 +83,6 @@ function AppMockup() {
               </div>
             </div>
 
-            {/* Right panel (preview) */}
             <div className="col-span-3 p-8 flex items-center justify-center bg-muted/10">
               <div className="w-full max-w-sm bg-card border border-border rounded-xl shadow-lg overflow-hidden">
                 <div className="bg-primary p-5 flex items-center gap-4">
@@ -262,157 +115,207 @@ function AppMockup() {
   );
 }
 
-/* ─── Features ─── */
-const feats = [
-  { icon: Palette, num: "01", title: "6 templates\nprofessionnels", desc: "Classic, Modern, Creative, Compact, Executive, Sidebar — chaque style est entièrement personnalisable." },
-  { icon: Zap, num: "02", title: "Aperçu\ntemps réel", desc: "Chaque modification est reflétée instantanément dans la prévisualisation. Pas d'attente." },
-  { icon: Shield, num: "03", title: "Couleurs &\nbrand personnel", desc: "Choisissez une couleur d'accent pour que votre CV soit unique et mémorable." },
-];
-
-function Features() {
+/* ─── How it works ─── */
+function StepIllustration1() {
   return (
-    <section className="max-w-7xl mx-auto px-6 py-24">
-      <InView>
-        <motion.div variants={fadeUp} className="flex items-center justify-between mb-16">
-          <h2 className="text-4xl md:text-5xl font-black tracking-tighter leading-tight">
-            Ce qui fait<br />
-            <span className="text-primary">la différence.</span>
-          </h2>
-          <span className="hidden md:block text-xs tracking-widest uppercase text-muted-foreground">Fonctionnalités</span>
-        </motion.div>
-
-        <div className="grid md:grid-cols-3 gap-px bg-border rounded-2xl overflow-hidden">
-          {feats.map(({ icon: Icon, num, title, desc }) => (
-            <motion.div
-              key={num}
-              variants={fadeUp}
-              className="bg-card p-8 space-y-6 group hover:bg-primary/[0.02] transition-colors"
-            >
-              <div className="flex items-start justify-between">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Icon className="h-5 w-5 text-primary" />
-                </div>
-                <span className="text-xs font-mono text-muted-foreground/40">{num}</span>
-              </div>
-              <h3 className="text-xl font-bold tracking-tight whitespace-pre-line">{title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-              <div className="h-px w-0 group-hover:w-full bg-primary transition-all duration-500" />
-            </motion.div>
-          ))}
+    <div className="relative w-full h-44 flex items-center justify-center">
+      {/* CV template mockup */}
+      <div className="w-24 bg-white rounded-lg shadow-md border border-[hsl(238,50%,90%)] overflow-hidden relative z-10">
+        <div className="h-2 bg-[hsl(238,66%,55%)]" />
+        <div className="p-2 space-y-1.5">
+          <div className="h-1 w-10 rounded-full bg-[hsl(238,66%,55%)]/30" />
+          <div className="h-0.5 w-full rounded-full bg-gray-200" />
+          <div className="h-0.5 w-4/5 rounded-full bg-gray-200" />
+          <div className="h-px bg-gray-100 my-1" />
+          <div className="h-0.5 w-full rounded-full bg-gray-200" />
+          <div className="h-0.5 w-3/4 rounded-full bg-gray-200" />
+          <div className="h-0.5 w-2/3 rounded-full bg-gray-200" />
         </div>
-      </InView>
-    </section>
+      </div>
+      {/* Badge */}
+      <div className="absolute top-3 left-6 w-8 h-8 rounded-lg bg-[hsl(238,66%,55%)] flex items-center justify-center shadow-lg z-20">
+        <LayoutGrid className="h-3.5 w-3.5 text-white" />
+      </div>
+    </div>
   );
 }
 
-/* ─── How it works ─── */
-const steps = [
-  { num: "1", icon: UserPlus, title: "Créez un compte", desc: "Inscription gratuite en 30 secondes." },
-  { num: "2", icon: PenLine, title: "Remplissez vos infos", desc: "Guidé section par section, avec aperçu live." },
-  { num: "3", icon: LayoutGrid, title: "Choisissez un template", desc: "6 designs + palette de couleurs." },
-  { num: "4", icon: Download, title: "Exportez en PDF", desc: "Téléchargement direct, prêt à envoyer." },
+function StepIllustration2() {
+  return (
+    <div className="relative w-full h-44 flex items-center justify-center">
+      <div className="w-32 bg-white rounded-lg shadow-md border border-[hsl(238,50%,90%)] overflow-hidden">
+        <div className="border-b border-gray-100 px-2 py-1.5 flex items-center gap-1">
+          <div className="w-1 h-1 rounded-full bg-red-300" />
+          <div className="w-1 h-1 rounded-full bg-yellow-300" />
+          <div className="w-1 h-1 rounded-full bg-green-300" />
+        </div>
+        <div className="p-2 space-y-1.5">
+          <div className="h-0.5 w-full rounded-full bg-[hsl(238,66%,55%)]/20" />
+          <div className="h-0.5 w-full rounded-full bg-[hsl(238,66%,55%)]/20" />
+          <div className="h-0.5 w-3/4 rounded-full bg-[hsl(238,66%,55%)]/20" />
+          <div className="h-3 w-full rounded bg-[hsl(238,66%,55%)]/5 mt-1" />
+          <div className="h-0.5 w-full rounded-full bg-[hsl(238,66%,55%)]/20" />
+          <div className="h-0.5 w-5/6 rounded-full bg-[hsl(238,66%,55%)]/20" />
+        </div>
+      </div>
+      {/* AI badge */}
+      <div className="absolute top-2 right-8 bg-white rounded-full shadow-lg border border-[hsl(238,50%,90%)] px-2.5 py-1 flex items-center gap-1.5 z-20">
+        <Zap className="h-3 w-3 text-[hsl(238,66%,55%)]" />
+        <span className="text-[9px] font-semibold text-gray-700">Aperçu live</span>
+      </div>
+    </div>
+  );
+}
+
+function StepIllustration3() {
+  return (
+    <div className="relative w-full h-44 flex items-center justify-center">
+      <div className="space-y-2">
+        {/* Size selector */}
+        <div className="flex gap-1 bg-white rounded-lg shadow-md border border-[hsl(238,50%,90%)] p-1">
+          {["XS", "S", "M", "L"].map((s, i) => (
+            <div key={s} className={`px-2 py-1 rounded text-[9px] font-bold ${i === 2 ? "bg-[hsl(238,66%,55%)] text-white" : "text-gray-400"}`}>
+              {s}
+            </div>
+          ))}
+        </div>
+        {/* Color palette */}
+        <div className="flex gap-1 bg-white rounded-lg shadow-md border border-[hsl(238,50%,90%)] p-1.5">
+          {["#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6", "#6366f1", "#8b5cf6", "#ec4899"].map((c) => (
+            <div key={c} className="w-4 h-4 rounded-full" style={{ backgroundColor: c }} />
+          ))}
+        </div>
+        {/* Format bar */}
+        <div className="flex gap-1 bg-white rounded-lg shadow-md border border-[hsl(238,50%,90%)] p-1.5">
+          {["B", "I", "U"].map((f) => (
+            <div key={f} className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-[hsl(238,66%,55%)] bg-[hsl(238,66%,55%)]/10">
+              {f}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StepIllustration4() {
+  return (
+    <div className="relative w-full h-44 flex items-center justify-center">
+      <div className="w-24 bg-white rounded-lg shadow-md border border-[hsl(238,50%,90%)] overflow-hidden">
+        <div className="p-2 space-y-1">
+          <div className="h-1 w-8 rounded-full bg-[hsl(238,66%,55%)]/30" />
+          <div className="h-0.5 w-full rounded-full bg-gray-200" />
+          <div className="h-0.5 w-4/5 rounded-full bg-gray-200" />
+          <div className="h-px bg-gray-100" />
+          <div className="h-0.5 w-full rounded-full bg-gray-200" />
+          <div className="h-0.5 w-3/4 rounded-full bg-gray-200" />
+        </div>
+      </div>
+      {/* Download badges */}
+      <div className="absolute top-2 right-6 w-8 h-8 rounded-lg bg-[hsl(235,40%,14%)] flex items-center justify-center shadow-lg z-20">
+        <Download className="h-3.5 w-3.5 text-white" />
+      </div>
+      <div className="absolute bottom-6 left-8 bg-white rounded-md shadow-lg border border-[hsl(238,50%,90%)] px-2 py-1 flex items-center gap-1.5">
+        <span className="text-[9px] font-bold text-gray-500">PDF</span>
+        <div className="h-1.5 w-10 rounded-full bg-emerald-400" />
+        <svg className="w-2.5 h-2.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+const stepsData = [
+  { illustration: <StepIllustration1 />, title: "Choisissez un modèle\napprouvé par les recruteurs." },
+  { illustration: <StepIllustration2 />, title: "Complétez votre CV\navec aperçu en temps réel." },
+  { illustration: <StepIllustration3 />, title: "Personnalisez le design\nselon vos goûts." },
+  { illustration: <StepIllustration4 />, title: "Téléchargez votre CV et\ncommencez à postuler." },
 ];
 
 function HowItWorks() {
   return (
-    <section className="border-t border-border bg-muted/20 py-24 px-6">
-      <InView className="max-w-7xl mx-auto">
-        <motion.div variants={fadeUp} className="mb-16">
-          <span className="text-xs tracking-widest uppercase text-muted-foreground">Processus</span>
-          <h2 className="text-4xl md:text-5xl font-black tracking-tighter mt-2">4 étapes.</h2>
-        </motion.div>
+    <section className="relative py-24 px-6 overflow-hidden">
+      {/* Dark background matching hero */}
+      <div className="absolute inset-0 bg-[hsl(235,40%,14%)]" />
 
-        <div className="grid md:grid-cols-4 gap-6">
-          {steps.map(({ num, title, desc, icon: Icon }) => (
+      <InView className="max-w-7xl mx-auto relative">
+        <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl font-black tracking-tighter text-center mb-16 text-white">
+          Créer votre CV en <span className="text-[hsl(238,66%,70%)]">4 étapes</span>
+        </motion.h2>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stepsData.map(({ illustration, title }, i) => (
             <motion.div
-              key={num}
+              key={i}
               variants={fadeUp}
-              whileHover={{ y: -8, scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="relative group rounded-2xl border border-border bg-card p-7 shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 overflow-hidden"
+              className="group"
             >
-              {/* Glow on hover */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" style={{ background: "radial-gradient(circle at 50% 0%, hsl(var(--primary) / 0.06) 0%, transparent 70%)" }} />
-
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-5">
-                  <div className="h-11 w-11 rounded-xl bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors duration-300">
-                    <Icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <span className="text-xs font-mono font-bold text-primary/40 group-hover:text-primary/70 transition-colors">0{num}</span>
-                </div>
-                <h3 className="font-bold text-base mb-2">{title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+              {/* Illustration card */}
+              <div className="rounded-2xl bg-[hsl(238,50%,95%)] p-4 mb-5 overflow-hidden transition-transform duration-300 group-hover:-translate-y-1">
+                {illustration}
               </div>
-
-              {/* Bottom accent bar */}
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+              {/* Title */}
+              <p className="text-sm font-semibold text-white/80 leading-relaxed whitespace-pre-line text-center">
+                {title}
+              </p>
             </motion.div>
           ))}
         </div>
-      </InView>
-    </section>
-  );
-}
 
-/* ─── CTA ─── */
-function CTA() {
-  return (
-    <section className="relative overflow-hidden py-32 px-6">
-      <div
-        className="absolute inset-0 opacity-[0.04]"
-        style={{ backgroundImage: `radial-gradient(circle at 60% 50%, hsl(var(--primary)) 0%, transparent 60%)` }}
-      />
-      <InView className="max-w-3xl mx-auto text-center relative">
-        <motion.p variants={fadeUp} className="text-xs tracking-widest uppercase text-muted-foreground mb-4">
-          Prêt à commencer ?
-        </motion.p>
-        <motion.h2 variants={fadeUp} className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.9] mb-10">
-          Votre prochain<br />
-          <span className="text-primary">poste vous attend.</span>
-        </motion.h2>
-        <motion.div variants={fadeUp}>
-          <Button size="lg" className="h-16 px-12 rounded-full text-lg font-bold group gap-3" asChild>
-            <Link href="/auth/register">
-              Créer mon CV gratuitement
-              <ArrowUpRight className="h-5 w-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+        {/* CTA */}
+        <motion.div variants={fadeUp} className="flex justify-center mt-14">
+          <Button size="lg" className="h-14 px-10 rounded-xl text-base font-semibold gap-2" asChild>
+            <Link href="/auth?mode=register">
+              Créer mon CV en ligne
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
-          <p className="text-sm text-muted-foreground mt-4">Aucune carte bancaire requise.</p>
         </motion.div>
       </InView>
     </section>
   );
 }
 
-/* ─── Footer ─── */
-function Footer() {
+/* ─── CTA Section ─── */
+function CTASection() {
   return (
-    <footer className="border-t border-border py-8 px-6">
-      <div className="max-w-7xl mx-auto flex items-center justify-between text-xs text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <div className="h-5 w-5 rounded bg-primary flex items-center justify-center">
-            <FileText className="h-2.5 w-2.5 text-primary-foreground" />
-          </div>
-          <span className="font-semibold text-foreground">CVBuilder</span>
-        </div>
-        <p>© {new Date().getFullYear()} CVBuilder. Tous droits réservés.</p>
+    <section className="relative py-24 md:py-32 px-6 overflow-hidden bg-muted/30">
+      <div className="relative max-w-4xl mx-auto text-center">
+        <InView>
+          <motion.span variants={fadeUp} className="text-xs font-medium tracking-widest uppercase text-primary">
+            Prêt à commencer ?
+          </motion.span>
+          <motion.h2 variants={fadeUp} className="text-5xl md:text-7xl font-black tracking-tighter text-foreground leading-[1.05] mt-6">
+            Votre prochain<br />
+            <span className="text-primary">poste vous attend.</span>
+          </motion.h2>
+          <motion.div variants={fadeUp} className="flex justify-center mt-10">
+            <Button size="lg" className="h-14 px-10 rounded-xl text-base font-semibold gap-2" asChild>
+              <Link href="/auth?mode=register">
+                Créer mon CV gratuitement
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </motion.div>
+          <motion.p variants={fadeUp} className="text-sm text-muted-foreground mt-5">
+            Aucune carte bancaire requise.
+          </motion.p>
+        </InView>
       </div>
-    </footer>
+    </section>
   );
 }
-
 /* ─── Page ─── */
 const Home = () => (
   <div className="min-h-screen bg-background text-foreground">
-    <Nav />
-    <Hero />
+    <LandingNav />
+    <HeroSection />
     <Marquee />
     <AppMockup />
-    <Features />
     <HowItWorks />
-    <CTA />
-    <Footer />
+    <CTASection />
+    <LandingFooter />
   </div>
 );
 

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback, SubmitEvent } from "react";
+import { useState, useEffect, useCallback, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
-import { FileText, ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { login, register } from "@/src/services/auth/client";
 import { useCVContext } from "@/src/context/CVContext";
 import toast from "react-hot-toast";
@@ -48,7 +48,7 @@ export default function AuthPage() {
         toast.error(message);
     }, []);
 
-    async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
+    async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const form = e.currentTarget;
         const email = (form.email as HTMLInputElement).value.trim();
@@ -64,12 +64,23 @@ export default function AuthPage() {
             return;
         }
 
+        let firstName = "";
+        let lastName = "";
+        if (!isLogin) {
+            firstName = (form.firstName as HTMLInputElement).value.trim();
+            lastName = (form.lastName as HTMLInputElement).value.trim();
+            if (!firstName || !lastName) {
+                showError("Prénom et nom requis");
+                return;
+            }
+        }
+
         setLoading(true);
         try {
             if (isLogin) {
                 await login({ email, password });
             } else {
-                await register({ email, password });
+                await register({ email, password, firstName, lastName });
             }
             toast.success(isLogin ? "Connexion réussie" : "Inscription réussie");
             await refetchUser();
@@ -87,73 +98,103 @@ export default function AuthPage() {
     }
 
     return (
-        <div className="min-h-screen bg-muted/30 flex items-center justify-center px-4">
-            <div className="w-full max-w-sm animate-fade-in">
-                <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
-                    <ArrowLeft className="h-4 w-4" />
-                    Retour
-                </Link>
+        <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="w-full max-w-md animate-fade-in">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
+            <ArrowLeft className="h-4 w-4" />
+            Retour
+          </Link>
 
-                <div className="text-center mb-6">
-                    <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-primary mb-3">
-                        <FileText className="h-6 w-6 text-primary-foreground" />
-                    </div>
-                    <h1 className="text-xl font-bold">
-                        {isLogin ? "Connexion" : "Créer un compte"}
-                    </h1>
-                    <p className="text-muted-foreground text-sm mt-1">
-                        {isLogin ? "Bon retour parmi nous !" : "Commencez gratuitement"}
-                    </p>
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground leading-tight">
+              {isLogin ? (
+                "Connexion"
+              ) : (
+                <>
+                  Créer un compte pour<br />
+                  <span className="text-primary">Obtenez votre CV</span>
+                </>
+              )}
+            </h1>
+            <p className="text-muted-foreground text-sm mt-3 max-w-sm">
+              {isLogin
+                ? "Bon retour parmi nous !"
+                : "Inscrivez-vous avec votre e-mail pour enregistrer, modifier et télécharger votre CV."}
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {!isLogin && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName" className="text-sm font-medium text-foreground">Prénom</Label>
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    required
+                    className="h-11 border-border"
+                  />
                 </div>
-
-                <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="space-y-1.5">
-                            <Label htmlFor="email" className="text-sm font-medium">Email</Label>
-                            <Input
-                                id="email"
-                                name="email"
-                                type="email"
-                                placeholder="vous@exemple.com"
-                                required
-                                className="h-10"
-                                disabled={loading}
-                            />
-                        </div>
-                        <div className="space-y-1.5">
-                            <Label htmlFor="password" className="text-sm font-medium">Mot de passe</Label>
-                            <Input
-                                id="password"
-                                name="password"
-                                type="password"
-                                placeholder="••••••••"
-                                required
-                                minLength={MIN_PASSWORD_LENGTH}
-                                className="h-10"
-                                disabled={loading}
-                            />
-                        </div>
-                        <Button
-                            type="submit"
-                            className="w-full h-10 bg-primary text-primary-foreground hover:bg-primary/90"
-                            disabled={loading}
-                        >
-                            {loading ? "Chargement…" : isLogin ? "Se connecter" : "Créer mon compte"}
-                            <ArrowRight className="h-4 w-4 ml-1" />
-                        </Button>
-                    </form>
-
-                    <div className="mt-5 pt-4 border-t border-border text-center">
-                        <Link
-                            href={isLogin ? "/auth/register" : "/auth/login"}
-                            className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                        >
-                            {isLogin ? "Pas encore de compte ? " : "Déjà un compte ? "}
-                            <span className="text-primary font-medium">{isLogin ? "S'inscrire" : "Se connecter"}</span>
-                        </Link>
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName" className="text-sm font-medium text-foreground">Nom de famille</Label>
+                  <Input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    required
+                    className="h-11 border-border"
+                  />
                 </div>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium text-foreground">Adresse e-mail</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                required
+                className="h-11 border-border"
+              />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium text-foreground">Mot de passe</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                minLength={MIN_PASSWORD_LENGTH}
+                className="h-11 border-border"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full h-12 rounded-xl text-base font-semibold"
+              disabled={loading}
+            >
+              {loading ? "Chargement..." : isLogin ? "Se connecter" : "Obtenez votre CV"}
+            </Button>
+          </form>
+
+          {/* Toggle */}
+          <p className="text-center text-sm text-muted-foreground mt-6">
+            {isLogin ? "Pas encore de compte ? " : "Vous avez déjà un compte ? "}
+            <Link
+              href={isLogin ? "/auth/register" : "/auth/login"}
+              className="text-primary font-medium hover:underline"
+            >
+              {isLogin ? "S'inscrire" : "Connexion"}
+            </Link>
+          </p>
         </div>
+      </div>
     );
 }

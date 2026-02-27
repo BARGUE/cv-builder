@@ -27,5 +27,6 @@ export async function login(credentials: AuthCredentials): Promise<AuthRouteResp
 }
 
 export async function register(credentials: AuthCredentials): Promise<AuthRouteResponse> {
+    console.log("register", credentials);
     return requestAuth("register", credentials);
 }

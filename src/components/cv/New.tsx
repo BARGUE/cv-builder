@@ -13,11 +13,12 @@ import { Textarea } from "@/src/components/ui/textarea";
 import {
   FileText, ChevronLeft, ChevronRight, Save, Check, Plus, Trash2, Upload,
   User, Briefcase, GraduationCap, Zap, AlignLeft, Layers, Settings, UserCircle,
-  Download
+  Download,
+  ArrowLeft
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog";
 import { useParams, useRouter } from "next/navigation";
-import Image from "next/image";
+import { log } from "console";
 
 const TEMPLATES: { id: CVData['template']; label: string }[] = [
   { id: 'classic', label: 'Classique' },
@@ -42,17 +43,35 @@ const CVNew = ({ initialCvData, initialCvId }: { initialCvData?: CVData | null; 
   const params = useParams<{ id?: string }>();
   const id = params?.id && params.id !== "new" ? params.id : undefined;
   const router = useRouter();
-  const { cvData, setCVData, saveCV, saving, downloading, downloadPDF, loadCV, cvDataLoading, cvsLoading } = useCVContext();
+  const { cvData, setCVData, saveCV, saving, downloading, downloadPDF, loadCV, cvDataLoading, cvsLoading, user } = useCVContext();
 
   useEffect(() => {
     const data = id === initialCvId ? initialCvData : undefined;
     loadCV(id, data);
   }, [id, initialCvId, initialCvData, loadCV]);
 
+  // Pre-remplissage nom + email depuis le profil utilisateur (un seul effet, uniquement pour un nouveau CV)
+  useEffect(() => {
+    const isNewCV = id == null;
+    if (!isNewCV || cvDataLoading || !user) return;
+
+    const updates: Partial<CVData> = {};
+    const first = user.profile?.firstName?.trim() ?? "";
+    const last = user.profile?.lastName?.trim() ?? "";
+    const fullName = [first, last].filter(Boolean).join(" ").trim();
+    if (fullName && !cvData.full_name.trim()) updates.full_name = fullName;
+
+    const email = user.email?.trim();
+    if (email && !cvData.email.trim()) updates.email = email;
+
+    if (Object.keys(updates).length > 0) {
+      setCVData((prev) => ({ ...prev, ...updates }));
+    }
+  }, [id, cvDataLoading, user, user?.profile?.firstName, user?.profile?.lastName, user?.email, cvData.full_name, cvData.email, setCVData]);
+
   const [currentStep, setCurrentStep] = useState(1);
   const [saved, setSaved] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [serverDownloading, setServerDownloading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -69,8 +88,6 @@ const CVNew = ({ initialCvData, initialCvId }: { initialCvData?: CVData | null; 
     }, 800);
     return () => clearTimeout(t);
   }, [router, id]);
-
- 
 
   const handleSave = async (param: 'finish' | 'kill') => {
     const dataToSave = { ...cvData, current_step: currentStep };
@@ -183,135 +200,186 @@ const CVNew = ({ initialCvData, initialCvId }: { initialCvData?: CVData | null; 
     7: { title: "Finaliser votre CV", subtitle: "Choisissez votre template et donnez un titre à votre CV." },
   };
 
+  const progress = Math.round((currentStep / 7) * 100);
+
   return (
     <>
-      <div className="min-h-screen bg-muted/30 flex flex-col">
-        <header className="border-b border-border bg-card px-6 h-12 flex items-center justify-between shrink-0">
-          <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded bg-primary flex items-center justify-center">
-              <FileText className="h-3.5 w-3.5 text-primary-foreground" />
+      <div className="min-h-screen bg-background flex flex-col">
+        {/* Top bar */}
+        <header className="border-b border-border bg-background px-6 h-14 flex items-center justify-between shrink-0">
+          <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-lg bg-[hsl(235,40%,14%)] flex items-center justify-center">
+              <FileText className="h-4 w-4 text-white" />
             </div>
-            <span className="font-semibold text-sm">CVBuilder</span>
+            <span className="font-black text-sm tracking-tight">CVBuilder</span>
+          </button>
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Retour au dashboard
           </button>
         </header>
 
         <div className="flex flex-1 overflow-hidden">
-          <aside className="w-52 bg-primary flex flex-col shrink-0">
+          {/* Step sidebar — dark navy */}
+          <aside className="w-56 bg-[hsl(235,40%,14%)] flex flex-col shrink-0">
             <nav className="flex-1 py-6 px-3 space-y-1">
               {steps.map((step) => {
                 const isActive = currentStep === step.num;
                 const isPast = currentStep > step.num;
+                const StepIcon = step.icon;
                 return (
                   <button
                     key={step.num}
                     onClick={() => step.num <= currentStep ? setCurrentStep(step.num) : undefined}
                     disabled={step.num > currentStep}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors text-left ${isActive
-                      ? 'bg-primary-foreground/15 text-primary-foreground font-medium'
-                      : step.num < currentStep
-                        ? 'text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/5 cursor-pointer'
-                        : 'text-primary-foreground/30 cursor-not-allowed'
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all text-left ${isActive
+                      ? 'bg-white/10 text-white font-semibold'
+                      : isPast
+                        ? 'text-white/60 hover:text-white hover:bg-white/5 cursor-pointer'
+                        : 'text-white/25 cursor-not-allowed'
                       }`}
                   >
-                    <div className={`h-7 w-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 ${isActive
-                      ? 'bg-primary-foreground text-primary'
+                    <div className={`h-7 w-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${isActive
+                      ? 'bg-primary text-primary-foreground'
                       : isPast
-                        ? 'bg-primary-foreground/30 text-primary-foreground'
-                        : 'bg-primary-foreground/10 text-primary-foreground/50'
+                        ? 'bg-white/15 text-white/80'
+                        : 'bg-white/5 text-white/30'
                       }`}>
-                      {isPast ? <Check className="h-3.5 w-3.5" /> : step.num}
+                      {isPast ? <Check className="h-3.5 w-3.5" /> : <StepIcon className="h-3.5 w-3.5" />}
                     </div>
-                    <span className="leading-tight">{step.label}</span>
+                    <span className="leading-tight truncate">{step.label}</span>
                   </button>
                 );
               })}
             </nav>
+
+            {/* Mini progress in sidebar */}
+            <div className="px-4 pb-6">
+              <div className="rounded-xl bg-white/5 p-4">
+                <p className="text-[10px] uppercase tracking-widest text-white/40 font-semibold mb-2">Progression</p>
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                    <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }} />
+                  </div>
+                  <span className="text-xs font-bold text-white/70">{progress}%</span>
+                </div>
+              </div>
+            </div>
           </aside>
 
+          {/* Form area */}
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="flex-1 overflow-y-auto">
-              <div className="max-w-5xl mx-auto w-full px-8 py-10 flex gap-8">
+              <div className="max-w-5xl mx-auto w-full px-8 lg:px-12 py-10 flex gap-8">
+                {/* Form */}
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-2xl font-bold mb-2">{stepTitles[currentStep].title}</h1>
-                  <p className="text-muted-foreground text-sm mb-8">{stepTitles[currentStep].subtitle}</p>
+                  {/* Step header */}
+                  <div className="mb-8">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-lg">
+                        Étape {currentStep}
+                      </span>
+                    </div>
+                    <h1 className="text-2xl font-black tracking-tight">{stepTitles[currentStep].title}</h1>
+                    <p className="text-muted-foreground text-sm mt-1">{stepTitles[currentStep].subtitle}</p>
+                  </div>
 
+                  {/* Step 1: Coordonnées */}
                   {currentStep === 1 && (
                     <div className="space-y-5">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <Label className="text-sm font-medium">Nom complet</Label>
-                          <Input value={cvData.full_name} onChange={e => update('full_name', e.target.value)} placeholder="ex. Jean Dupont" />
+                      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <User className="h-4 w-4 text-primary" />
+                          </div>
+                          <span className="text-sm font-bold tracking-tight">Photo & identité</span>
                         </div>
-                        <div className="space-y-1.5">
-                          <Label className="text-sm font-medium">Intitulé du poste</Label>
-                          <Input value={cvData.job_title} onChange={e => update('job_title', e.target.value)} placeholder="ex. Développeur Web" />
-                        </div>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <Label className="text-sm font-medium">Photo (facultatif)</Label>
-                        <div className="flex items-center gap-4">
-                          <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center overflow-hidden border border-border shrink-0">
+                        <div className="flex items-center gap-5">
+                          <div className="h-16 w-16 rounded-2xl bg-muted flex items-center justify-center overflow-hidden border border-border shrink-0">
                             {cvData.photo_url ? (
-                              <Image src={cvData.photo_url} alt="Photo" className="h-full w-full object-cover" width={56} height={56} />
+                              <img src={cvData.photo_url} alt="Photo" className="h-full w-full object-cover" />
                             ) : (
                               <User className="h-6 w-6 text-muted-foreground" />
                             )}
                           </div>
                           <div className="flex flex-col gap-2">
                             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
-                            <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+                            <Button variant="outline" size="sm" className="rounded-xl" onClick={() => fileInputRef.current?.click()}>
                               <Upload className="h-3.5 w-3.5 mr-1.5" />
-                              {cvData.photo_url ? 'Changer la photo' : 'Ajouter une photo'}
+                              {cvData.photo_url ? 'Changer' : 'Ajouter une photo'}
                             </Button>
                             {cvData.photo_url && (
-                              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => update('photo_url', null)}>
+                              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl" onClick={() => update('photo_url', null)}>
                                 <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                                Supprimer la photo
+                                Supprimer
                               </Button>
                             )}
                           </div>
                         </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <Label className="text-sm font-medium">Nom complet *</Label>
+                            <Input className="h-11 rounded-xl" value={cvData.full_name} onChange={e => update('full_name', e.target.value)} placeholder="ex. Jean Dupont" />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-sm font-medium">Intitulé du poste *</Label>
+                            <Input className="h-11 rounded-xl" value={cvData.job_title} onChange={e => update('job_title', e.target.value)} placeholder="ex. Développeur Web" />
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <Label className="text-sm font-medium">Numéro de téléphone</Label>
-                          <Input value={cvData.phone} onChange={e => update('phone', e.target.value)} placeholder="ex. (020) 1234 5678" />
+                      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <Briefcase className="h-4 w-4 text-primary" />
+                          </div>
+                          <span className="text-sm font-bold tracking-tight">Contact</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1.5">
+                            <Label className="text-sm font-medium">Téléphone *</Label>
+                            <Input className="h-11 rounded-xl" value={cvData.phone} onChange={e => update('phone', e.target.value)} placeholder="ex. 06 12 34 56 78" />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label className="text-sm font-medium">E-mail *</Label>
+                            <Input className="h-11 rounded-xl" value={cvData.email} onChange={e => update('email', e.target.value)} placeholder="ex. jean@exemple.com" />
+                          </div>
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-sm font-medium">E-mail</Label>
-                          <Input value={cvData.email} onChange={e => update('email', e.target.value)} placeholder="ex. jean@exemple.com" />
+                          <Label className="text-sm font-medium">Ville *</Label>
+                          <Input className="h-11 rounded-xl" value={cvData.location} onChange={e => update('location', e.target.value)} placeholder="ex. Paris, France" />
                         </div>
-                      </div>
-
-                      <div className="space-y-1.5">
-                        <Label className="text-sm font-medium">Ville</Label>
-                        <Input value={cvData.location} onChange={e => update('location', e.target.value)} placeholder="ex. Paris" />
                       </div>
                     </div>
                   )}
 
+                  {/* Step 2: Expériences */}
                   {currentStep === 2 && (
                     <div className="space-y-4">
-                      {cvData.experiences.map((exp) => (
-                        <div key={exp.id} className="rounded-xl border border-border bg-card p-5 space-y-3 relative">
-                          <Button variant="ghost" size="icon" className="absolute top-3 right-3 h-7 w-7 text-destructive hover:bg-destructive/10" onClick={() => removeExperience(exp.id)}>
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                          <div className="grid grid-cols-2 gap-3">
+                      {cvData.experiences.map((exp, i) => (
+                        <div key={exp.id} className="rounded-2xl border border-border bg-card p-6 space-y-4 relative">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-muted-foreground">Expérience {i + 1}</span>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-destructive hover:bg-destructive/10" onClick={() => removeExperience(exp.id)}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <Label className="text-sm font-medium">Entreprise</Label>
-                              <Input value={exp.company} onChange={e => updateExperience(exp.id, 'company', e.target.value)} placeholder="ex. Google" />
+                              <Label className="text-sm font-medium">Entreprise *</Label>
+                              <Input className="h-11 rounded-xl" value={exp.company} onChange={e => updateExperience(exp.id, 'company', e.target.value)} placeholder="ex. Google" />
                             </div>
                             <div className="space-y-1.5">
-                              <Label className="text-sm font-medium">Poste</Label>
-                              <Input value={exp.position} onChange={e => updateExperience(exp.id, 'position', e.target.value)} placeholder="ex. Développeur Senior" />
+                              <Label className="text-sm font-medium">Poste *</Label>
+                              <Input className="h-11 rounded-xl" value={exp.position} onChange={e => updateExperience(exp.id, 'position', e.target.value)} placeholder="ex. Développeur Senior" />
                             </div>
                           </div>
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <Label className="text-sm font-medium">Date de début</Label>
+                              <Label className="text-sm font-medium">Date de début *</Label>
                               <ScrollDatePicker value={exp.start_date} onChange={v => updateExperience(exp.id, 'start_date', v)} placeholder="ex. Jan 2020" className="w-full" />
                             </div>
                             <div className="space-y-1.5">
@@ -321,37 +389,41 @@ const CVNew = ({ initialCvData, initialCvId }: { initialCvData?: CVData | null; 
                           </div>
                           <div className="space-y-1.5">
                             <Label className="text-sm font-medium">Description</Label>
-                            <Textarea value={exp.description} onChange={e => updateExperience(exp.id, 'description', e.target.value)} placeholder="Décrivez vos responsabilités..." rows={3} className="resize-none" />
+                            <Textarea className="rounded-xl resize-none" value={exp.description} onChange={e => updateExperience(exp.id, 'description', e.target.value)} placeholder="Décrivez vos responsabilités..." rows={3} />
                           </div>
                         </div>
                       ))}
-                      <Button variant="outline" onClick={addExperience} className="w-full">
-                        <Plus className="h-4 w-4 mr-1" />
+                      <Button variant="outline" onClick={addExperience} className="w-full h-12 rounded-xl border-dashed gap-2">
+                        <Plus className="h-4 w-4" />
                         Ajouter une expérience
                       </Button>
                     </div>
                   )}
 
+                  {/* Step 3: Formation */}
                   {currentStep === 3 && (
                     <div className="space-y-4">
-                      {cvData.education.map((edu) => (
-                        <div key={edu.id} className="rounded-xl border border-border bg-card p-5 space-y-3 relative">
-                          <Button variant="ghost" size="icon" className="absolute top-3 right-3 h-7 w-7 text-destructive hover:bg-destructive/10" onClick={() => removeEducation(edu.id)}>
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                          <div className="grid grid-cols-2 gap-3">
+                      {cvData.education.map((edu, i) => (
+                        <div key={edu.id} className="rounded-2xl border border-border bg-card p-6 space-y-4 relative">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-muted-foreground">Formation {i + 1}</span>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-destructive hover:bg-destructive/10" onClick={() => removeEducation(edu.id)}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <Label className="text-sm font-medium">École / Université</Label>
-                              <Input value={edu.school} onChange={e => updateEducation(edu.id, 'school', e.target.value)} placeholder="ex. Université Paris-Saclay" />
+                              <Label className="text-sm font-medium">École / Université *</Label>
+                              <Input className="h-11 rounded-xl" value={edu.school} onChange={e => updateEducation(edu.id, 'school', e.target.value)} placeholder="ex. Université Paris-Saclay" />
                             </div>
                             <div className="space-y-1.5">
-                              <Label className="text-sm font-medium">Diplôme</Label>
-                              <Input value={edu.degree} onChange={e => updateEducation(edu.id, 'degree', e.target.value)} placeholder="ex. Master Informatique" />
+                              <Label className="text-sm font-medium">Diplôme *</Label>
+                              <Input className="h-11 rounded-xl" value={edu.degree} onChange={e => updateEducation(edu.id, 'degree', e.target.value)} placeholder="ex. Master Informatique" />
                             </div>
                           </div>
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
-                              <Label className="text-sm font-medium">Date de début</Label>
+                              <Label className="text-sm font-medium">Date de début *</Label>
                               <ScrollDatePicker value={edu.start_date} onChange={v => updateEducation(edu.id, 'start_date', v)} placeholder="ex. Sep 2018" className="w-full" />
                             </div>
                             <div className="space-y-1.5">
@@ -361,68 +433,71 @@ const CVNew = ({ initialCvData, initialCvId }: { initialCvData?: CVData | null; 
                           </div>
                         </div>
                       ))}
-                      <Button variant="outline" onClick={addEducation} className="w-full">
-                        <Plus className="h-4 w-4 mr-1" />
+                      <Button variant="outline" onClick={addEducation} className="w-full h-12 rounded-xl border-dashed gap-2">
+                        <Plus className="h-4 w-4" />
                         Ajouter une formation
                       </Button>
                     </div>
                   )}
 
+                  {/* Step 4: Compétences */}
                   {currentStep === 4 && (
                     <div className="space-y-3">
                       {cvData.skills.map((skill) => (
-                        <div key={skill.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
-                          <Input className="flex-1" placeholder="ex. JavaScript" value={skill.name} onChange={e => updateSkill(skill.id, 'name', e.target.value)} />
+                        <div key={skill.id} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
+                          <Input className="flex-1 h-11 rounded-xl" placeholder="ex. JavaScript" value={skill.name} onChange={e => updateSkill(skill.id, 'name', e.target.value)} />
                           <div className="flex gap-1">
                             {[1, 2, 3, 4, 5].map(l => (
                               <button
                                 key={l}
                                 type="button"
                                 onClick={() => updateSkill(skill.id, 'level', l)}
-                                className={`h-8 w-8 rounded-lg text-xs font-semibold transition-colors ${l <= skill.level ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                className={`h-9 w-9 rounded-lg text-xs font-bold transition-colors ${l <= skill.level ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
                                   }`}
                               >
                                 {l}
                               </button>
                             ))}
                           </div>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => removeSkill(skill.id)}>
+                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg text-destructive hover:bg-destructive/10" onClick={() => removeSkill(skill.id)}>
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       ))}
-                      <Button variant="outline" onClick={addSkill} className="w-full">
-                        <Plus className="h-4 w-4 mr-1" />
+                      <Button variant="outline" onClick={addSkill} className="w-full h-12 rounded-xl border-dashed gap-2">
+                        <Plus className="h-4 w-4" />
                         Ajouter une compétence
                       </Button>
                     </div>
                   )}
 
+                  {/* Step 5: Résumé */}
                   {currentStep === 5 && (
-                    <div className="space-y-4">
+                    <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
                       <div className="space-y-1.5">
-                        <Label className="text-sm font-medium">Résumé professionnel</Label>
+                        <Label className="text-sm font-medium">Résumé professionnel *</Label>
                         <Textarea
+                          className="rounded-xl resize-none"
                           value={cvData.summary}
                           onChange={e => update('summary', e.target.value)}
                           placeholder="Décrivez-vous en quelques phrases. Mettez en avant vos points forts et votre valeur ajoutée..."
-                          rows={6}
-                          className="resize-none"
+                          rows={8}
                         />
+                        <p className="text-xs text-muted-foreground">{cvData.summary.length} caractères</p>
                       </div>
                     </div>
                   )}
 
+                  {/* Step 6: Langues */}
                   {currentStep === 6 && (
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-sm">Langues</h3>
+                    <div className="space-y-3">
                       {cvData.languages.map((lang) => (
-                        <div key={lang.id} className="flex items-center gap-2 rounded-xl border border-border bg-card p-3">
-                          <Input className="w-48" placeholder="ex. Anglais" value={lang.name} onChange={e => updateLanguage(lang.id, 'name', e.target.value)} />
+                        <div key={lang.id} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4">
+                          <Input className="flex-1 h-11 rounded-xl" placeholder="ex. Anglais" value={lang.name} onChange={e => updateLanguage(lang.id, 'name', e.target.value)} />
                           <select
                             value={lang.level}
                             onChange={e => updateLanguage(lang.id, 'level', e.target.value)}
-                            className="h-10 rounded-md border border-input bg-background px-3 text-sm w-auto"
+                            className="h-11 rounded-xl border border-input bg-background px-3 text-sm"
                           >
                             <option>Débutant</option>
                             <option>Intermédiaire</option>
@@ -430,38 +505,40 @@ const CVNew = ({ initialCvData, initialCvId }: { initialCvData?: CVData | null; 
                             <option>Courant</option>
                             <option>Natif</option>
                           </select>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10" onClick={() => removeLanguage(lang.id)}>
+                          <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg text-destructive hover:bg-destructive/10" onClick={() => removeLanguage(lang.id)}>
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
                       ))}
-                      <Button variant="outline" onClick={addLanguage} className="w-full">
-                        <Plus className="h-4 w-4 mr-1" />
+                      <Button variant="outline" onClick={addLanguage} className="w-full h-12 rounded-xl border-dashed gap-2">
+                        <Plus className="h-4 w-4" />
                         Ajouter une langue
                       </Button>
                     </div>
                   )}
 
-                  {currentStep === 7 && (
+                 {/* Step 7: Finaliser */}
+                 {currentStep === 7 && (
                     <div className="space-y-6">
-                      <div className="space-y-1.5">
-                        <Label className="text-sm font-medium">Titre du CV</Label>
-                        <Input value={cvData.title} onChange={e => update('title', e.target.value)} placeholder="ex. Mon CV Développeur" />
+                      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+                        <span className="text-sm font-bold tracking-tight">Titre du CV</span>
+                        <Input className="h-11 rounded-xl" value={cvData.title} onChange={e => update('title', e.target.value)} placeholder="ex. Mon CV Développeur" />
                       </div>
 
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Template</Label>
+                      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+                        <span className="text-sm font-bold tracking-tight">Template</span>
                         <div className="grid grid-cols-3 gap-3">
-                          {(['classic', 'modern', 'creative'] as const).map(t => (
+                          {TEMPLATES.map(t => (
                             <button
-                              key={t}
-                              onClick={() => update('template', t)}
-                              className={`rounded-xl border-2 p-4 text-center text-sm font-medium capitalize transition-all ${cvData.template === t
-                                ? 'border-primary bg-primary/5 text-primary'
-                                : 'border-border hover:border-primary/30'
-                                }`}
+                              key={t.id}
+                              onClick={() => update('template', t.id)}
+                              className={`rounded-xl border-2 p-4 text-center text-sm font-semibold transition-all ${
+                                cvData.template === t.id
+                                  ? 'border-primary bg-primary/5 text-primary'
+                                  : 'border-border hover:border-primary/30'
+                              }`}
                             >
-                              {t === 'classic' ? 'Classique' : t === 'modern' ? 'Moderne' : 'Créatif'}
+                              {t.label}
                             </button>
                           ))}
                         </div>
@@ -470,15 +547,16 @@ const CVNew = ({ initialCvData, initialCvId }: { initialCvData?: CVData | null; 
                   )}
                 </div>
 
+                {/* Preview mini */}
                 <div className="hidden lg:flex flex-col w-72 shrink-0 sticky top-0 self-start">
-                  <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden" style={{ width: '288px', height: '407px' }}>
+                  <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden" style={{ width: '288px', height: '407px' }}>
                     <div style={{ transform: 'scale(0.484)', transformOrigin: 'top left', width: '595px', height: '842px', pointerEvents: 'none' }}>
                       <CVPreview data={cvData} />
                     </div>
                   </div>
                   <Button
                     variant="outline"
-                    className="mt-3 w-full gap-2"
+                    className="mt-3 w-full gap-2 rounded-xl"
                     onClick={() => setShowTemplateModal(true)}
                   >
                     <Layers className="h-4 w-4" />
@@ -488,46 +566,44 @@ const CVNew = ({ initialCvData, initialCvId }: { initialCvData?: CVData | null; 
               </div>
             </div>
 
+            {/* Bottom bar */}
             <div className="border-t border-border bg-card shrink-0">
-              <div className="max-w-5xl mx-auto px-8 py-3 flex items-center justify-between">
+              <div className="max-w-5xl mx-auto px-8 lg:px-12 py-3.5 flex items-center justify-between">
                 <button
                   onClick={() => currentStep > 1 ? setCurrentStep(currentStep - 1) : router.push("/dashboard")}
-                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Retour
+                  {currentStep > 1 ? 'Précédent' : 'Dashboard'}
                 </button>
                 <div className="flex items-center gap-3">
                   {!stepValid && currentStep < 7 && (
-                    <p className="text-xs text-destructive">Veuillez remplir tous les champs obligatoires</p>
+                    <p className="text-xs text-destructive font-medium">Champs obligatoires manquants</p>
                   )}
-                  <Button variant="outline" size="sm" onClick={() => handleSave('kill')} disabled={saving}>
-                    {saved ? <><Check className="h-4 w-4 mr-1" /> Sauvegardé</> : saving ? "Sauvegarde..." : <><Save className="h-4 w-4 mr-1" /> Sauvegarder</>}
+                  <Button variant="outline" size="sm" className="rounded-xl gap-1.5" onClick={() => handleSave('finish')} disabled={saving}>
+                    {saved ? <><Check className="h-3.5 w-3.5" /> Sauvegardé</> : saving ? "..." : <><Save className="h-3.5 w-3.5" /> Sauvegarder</>}
                   </Button>
                   {currentStep < 7 ? (
                     <Button
                       size="sm"
-                      className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="rounded-xl gap-1.5 disabled:opacity-40"
                       onClick={() => stepValid && setCurrentStep(currentStep + 1)}
                       disabled={!stepValid}
                     >
                       Suivant
-                      <ChevronRight className="h-4 w-4 ml-1" />
+                      <ChevronRight className="h-3.5 w-3.5" />
                     </Button>
                   ) : (
                     <>
-                      <Button
-                        variant="outline"
-                        size="sm"
+                      <Button variant="outline" size="sm" className="rounded-xl gap-1.5"
                         onClick={() => downloadPDF(pdfRef.current)}
-                        disabled={downloading || serverDownloading}
-                      >
-                        <Download className="h-4 w-4 mr-1" />
-                        {downloading || serverDownloading ? "Génération..." : "Télécharger PDF"}
+                        disabled={downloading}>
+                        <Download className="h-3.5 w-3.5" />
+                        {downloading ? "..." : "PDF"}
                       </Button>
-                      <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => handleSave('finish')}>
+                      <Button size="sm" className="rounded-xl gap-1.5" onClick={() => handleSave('kill')}>
                         Terminer
-                        <Check className="h-4 w-4 ml-1" />
+                        <Check className="h-3.5 w-3.5" />
                       </Button>
                     </>
                   )}
@@ -538,38 +614,38 @@ const CVNew = ({ initialCvData, initialCvId }: { initialCvData?: CVData | null; 
         </div>
       </div>
 
+      {/* Template Modal */}
       <Dialog open={showTemplateModal} onOpenChange={setShowTemplateModal}>
-        <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Changer de modèle</DialogTitle>
+            <DialogTitle className="text-xl font-black tracking-tight">Changer de modèle</DialogTitle>
           </DialogHeader>
-
           <div className="flex-1 overflow-y-auto min-h-0">
             <div className="grid grid-cols-3 gap-4 py-2 pr-1">
               {TEMPLATES.map(t => (
                 <button
                   key={t.id}
                   onClick={() => { update('template', t.id); setShowTemplateModal(false); }}
-                  className={`flex flex-col items-center gap-2 rounded-xl border-2 p-2 transition-all ${cvData.template === t.id
-                    ? 'border-primary ring-2 ring-primary/20'
-                    : 'border-border hover:border-primary/40'
-                    }`}
+                  className={`flex flex-col items-center gap-2 rounded-2xl border-2 p-2 transition-all ${
+                    cvData.template === t.id
+                      ? 'border-primary ring-2 ring-primary/20'
+                      : 'border-border hover:border-primary/40'
+                  }`}
                 >
-                  <div className="rounded-lg overflow-hidden bg-muted w-full" style={{ height: '200px' }}>
-                    <div style={{ transform: 'scale(0.265)', transformOrigin: 'top left', width: '595px', height: '755px', pointerEvents: 'none' }}>
+                  <div className="rounded-xl overflow-hidden w-full relative" style={{ aspectRatio: '595 / 842' }}>
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '595px', transformOrigin: 'top left', transform: 'scale(var(--preview-scale))', pointerEvents: 'none' }} ref={(el) => { if (el) { const parent = el.parentElement; if (parent) { const s = parent.offsetWidth / 595; el.style.setProperty('--preview-scale', String(s)); } } }}>
                       <CVPreview data={{ ...cvData, template: t.id }} />
                     </div>
                   </div>
-                  <span className={`text-sm font-semibold ${cvData.template === t.id ? 'text-primary' : 'text-foreground'}`}>
+                  <span className={`text-sm font-bold ${cvData.template === t.id ? 'text-primary' : 'text-foreground'}`}>
                     {t.label}
                   </span>
                 </button>
               ))}
             </div>
           </div>
-
           <div className="border-t border-border pt-4">
-            <p className="text-sm font-semibold mb-3">Couleur d'accent</p>
+            <p className="text-sm font-bold mb-3">Couleur d'accent</p>
             <div className="flex items-center gap-2 flex-wrap">
               {ACCENT_COLORS.map(c => (
                 <button
@@ -586,16 +662,9 @@ const CVNew = ({ initialCvData, initialCvId }: { initialCvData?: CVData | null; 
                 />
               ))}
               <div className="relative h-8 w-8">
-                <input
-                  type="color"
-                  value={cvData.accent_color}
-                  onChange={e => update('accent_color', e.target.value)}
-                  className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-                />
-                <div
-                  className="h-8 w-8 rounded-full border-2 border-dashed border-muted-foreground flex items-center justify-center text-muted-foreground text-xs font-bold hover:border-foreground transition-colors"
-                  style={{ backgroundColor: ACCENT_COLORS.some(c => c.value === cvData.accent_color) ? 'transparent' : cvData.accent_color }}
-                >
+                <input type="color" value={cvData.accent_color} onChange={e => update('accent_color', e.target.value)} className="absolute inset-0 opacity-0 w-full h-full cursor-pointer" />
+                <div className="h-8 w-8 rounded-full border-2 border-dashed border-muted-foreground flex items-center justify-center text-muted-foreground text-xs font-bold hover:border-foreground transition-colors"
+                  style={{ backgroundColor: ACCENT_COLORS.some(c => c.value === cvData.accent_color) ? 'transparent' : cvData.accent_color }}>
                   {ACCENT_COLORS.some(c => c.value === cvData.accent_color) ? '+' : ''}
                 </div>
               </div>

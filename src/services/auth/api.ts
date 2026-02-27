@@ -95,7 +95,8 @@ export async function getMe(accessToken: string): Promise<MeResponse | null> {
 }
 
 export interface UpdateProfileBody {
-    fullName?: string;
+    firstName?: string;
+    lastName?: string;
     avatarUrl?: string;
 }
 

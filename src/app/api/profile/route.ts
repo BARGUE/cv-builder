@@ -9,7 +9,7 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  let body: { fullName?: string; avatarUrl?: string };
+  let body: { firstName?: string; lastName?: string; avatarUrl?: string };
   try {
     body = await request.json();
   } catch {
@@ -18,7 +18,8 @@ export async function PATCH(request: Request) {
 
   try {
     const profile = await updateProfileApi(token, {
-      fullName: body.fullName,
+      firstName: body.firstName,
+      lastName: body.lastName,
       avatarUrl: body.avatarUrl,
     });
     return NextResponse.json(profile);
