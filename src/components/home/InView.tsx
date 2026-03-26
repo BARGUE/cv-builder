@@ -1,6 +1,8 @@
+"use client";
+
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { stagger } from "./animations";
+import { stagger } from "@/src/lib/animations";
 
 export function InView({ children, className }: { children: React.ReactNode; className?: string }) {
   const ref = useRef(null);

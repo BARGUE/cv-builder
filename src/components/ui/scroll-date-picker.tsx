@@ -263,7 +263,7 @@ export function ScrollDatePicker({
                 <Button
                     variant="outline"
                     className={cn(
-                        "justify-start text-left font-normal",
+                        "justify-start text-left font-normal hover:bg-transparent hover:text-foreground",
                         !value && "text-muted-foreground",
                         className
                     )}

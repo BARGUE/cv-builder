@@ -1,79 +1,76 @@
-export interface CVData {
-    id?: string;
-    user_id?: string;
-    title: string;
-    template: 'classic' | 'modern' | 'creative' | 'compact' | 'executive' | 'sidebar';
-    accent_color: string;
-    photo_url: string;
-    full_name: string;
-    job_title: string;
-    email: string;
-    phone: string;
-    location: string;
-    summary: string;
-    experiences: Experience[];
-    education: Education[];
-    skills: Skill[];
-    languages: Language[];
-    current_step?: number;
-    completed?: boolean;
-}
+import type {
+  CVData,
+  Experience,
+  Education,
+  Skill,
+  Language,
+} from "@/src/components/cv/types";
 
-export interface Experience {
-    id: string;
-    company: string;
-    position: string;
-    start_date: string;
-    end_date: string;
-    description: string;
-}
+export type {
+  CVData,
+  CVListItem,
+  Experience,
+  Education,
+  Skill,
+  Language,
+  CVTemplate,
+} from "@/src/components/cv/types";
 
-export interface Education {
-    id: string;
-    school: string;
-    degree: string;
-    start_date: string;
-    end_date: string;
-}
+const defaultCVDataBase = {
+  title: "Mon CV",
+  template: "classic",
+  accentColor: "#4F46E5",
+  photoUrl: "",
+  fullName: "",
+  jobTitle: "",
+  email: "",
+  phone: "",
+  location: "",
+  summary: "",
+} as const;
 
-export interface Skill {
-    id: string;
-    name: string;
-    level: number;
-}
-
-export interface Language {
-    id: string;
-    name: string;
-    level: string;
-}
-
-export const ACCENT_COLORS = [
-    { label: 'Indigo', value: '#4F46E5' },
-    { label: 'Bleu', value: '#2563EB' },
-    { label: 'Vert', value: '#16A34A' },
-    { label: 'Rouge', value: '#DC2626' },
-    { label: 'Orange', value: '#EA580C' },
-    { label: 'Violet', value: '#7C3AED' },
-    { label: 'Rose', value: '#DB2777' },
-    { label: 'Gris', value: '#374151' },
-];
+const emptyExperience: Experience = {
+  id: "",
+  company: "",
+  position: "",
+  startDate: "",
+  endDate: "",
+  description: "",
+};
+const emptyEducation: Education = {
+  id: "",
+  school: "",
+  degree: "",
+  startDate: "",
+  endDate: "",
+};
+const emptySkill: Skill = {
+  id: "",
+  name: "",
+  level: 0,
+};
+const emptyLanguage: Language = {
+  id: "",
+  name: "",
+  level: "Intermédiaire",
+};
 
 export const defaultCVData: CVData = {
-    title: 'Mon CV',
-    template: 'classic',
-    accent_color: '#4F46E5',
-    photo_url: '',
-    full_name: '',
-    job_title: '',
-    email: '',
-    phone: '',
-    location: '',
-    summary: '',
-    experiences: [],
-    education: [],
-    skills: [],
-    languages: [],
-    current_step: 1,
-    completed: false,
+  ...defaultCVDataBase,
+  experiences: [emptyExperience],
+  education: [emptyEducation],
+  skills: [emptySkill],
+  languages: [emptyLanguage],
+  currentStep: 1,
+  completed: false,
+};
+
+export const defaultImportCVData: CVData = {
+  ...defaultCVDataBase,
+  experiences: [emptyExperience],
+  education: [emptyEducation],
+  skills: [emptySkill],
+  languages: [emptyLanguage],
+  currentStep: 7,
+  completed: true,
 };

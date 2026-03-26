@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getMe } from "@/src/services/auth/api";
+import { getMe, isSessionExpiredError } from "@/src/services/auth/api";
 import { writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 
-const MAX_SIZE = 2 * 1024 * 1024; // 2 Mo
+const MAX_SIZE = 2 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 function getExtension(mime: string): string {
@@ -20,9 +20,14 @@ export async function POST(request: Request) {
   if (!token) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
-  const user = await getMe(token);
-  if (!user) {
-    return NextResponse.json({ error: "Token invalide ou expiré" }, { status: 401 });
+  let user;
+  try {
+    user = await getMe(token);
+  } catch (e) {
+    if (isSessionExpiredError(e)) {
+      return NextResponse.json({ error: "Session expirée" }, { status: 401 });
+    }
+    throw e;
   }
 
   let formData: FormData;

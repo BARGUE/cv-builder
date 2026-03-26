@@ -1,4 +1,4 @@
-import type { CVData } from "@/src/types/cv";
+import type { CVData, CVListItem } from "@/src/types/cv";
 
 const AUTH_API_URL = process.env.AUTH_API_URL;
 
@@ -9,70 +9,27 @@ function getBaseUrl(): string {
     return AUTH_API_URL.replace(/\/$/, "");
 }
 
-export interface ApiCv {
-    id: string;
-    userId: string;
-    title: string;
-    template: string;
-    accentColor?: string;
-    photoUrl?: string | null;
-    fullName: string;
-    jobTitle: string;
-    email: string;
-    phone: string;
-    location: string;
-    summary: string;
-    experiences: unknown;
-    education: unknown;
-    skills: unknown;
-    languages: unknown;
-    updatedAt?: string;
-    currentStep?: number;
-    completed?: boolean;
-}
-
-export interface ApiCvListItem {
-    id: string;
-    title: string;
-    template: string;
-    fullName: string;
-    jobTitle: string;
-    updatedAt: string;
-    currentStep?: number;
-    completed?: boolean;
-}
-
-function mapApiCvToCVData(api: ApiCv): CVData {
+function mapApiItemToCVListItem(item: CVData): CVListItem {
     return {
-        id: api.id,
-        user_id: api.userId,
-        title: api.title,
-        template: api.template as CVData["template"],
-        accent_color: api.accentColor ?? "#4F46E5",
-        photo_url: api.photoUrl ?? "",
-        full_name: api.fullName ?? "",
-        job_title: api.jobTitle ?? "",
-        email: api.email ?? "",
-        phone: api.phone ?? "",
-        location: api.location ?? "",
-        summary: api.summary ?? "",
-        experiences: (api.experiences as CVData["experiences"]) ?? [],
-        education: (api.education as CVData["education"]) ?? [],
-        skills: (api.skills as CVData["skills"]) ?? [],
-        languages: (api.languages as CVData["languages"]) ?? [],
-        current_step: api.currentStep ?? 1,
-        completed: api.completed ?? false,
+        id: item.id ?? "",
+        title: item.title ?? "",
+        template: item.template ?? "",
+        fullName: item.fullName ?? "",
+        jobTitle: item.jobTitle ?? "",
+        updatedAt: item.updatedAt ?? new Date().toISOString(),
+        currentStep: item.currentStep ?? 1,
+        completed: item.completed ?? false,
     };
 }
 
-export function mapCVDataToApiPayload(data: CVData) {
+export function buildSavePayload(data: CVData): Record<string, unknown> {
     return {
-        title: data.title,
+        title: data.title || "Mon CV",
         template: data.template,
-        accentColor: data.accent_color,
-        photoUrl: data.photo_url || null,
-        fullName: data.full_name,
-        jobTitle: data.job_title,
+        accentColor: data.accentColor,
+        photoUrl: data.photoUrl || null,
+        fullName: data.fullName,
+        jobTitle: data.jobTitle,
         email: data.email,
         phone: data.phone,
         location: data.location,
@@ -81,7 +38,7 @@ export function mapCVDataToApiPayload(data: CVData) {
         education: data.education,
         skills: data.skills,
         languages: data.languages,
-        currentStep: data.current_step ?? 1,
+        currentStep: data.currentStep ?? 1,
         completed: data.completed ?? false,
     };
 }
@@ -93,71 +50,72 @@ export async function getCvApi(cvId: string, accessToken: string): Promise<CVDat
         cache: "no-store",
     });
     if (!res.ok) return null;
-    const api = (await res.json()) as ApiCv;
-    return mapApiCvToCVData(api);
+    const api = (await res.json()) as CVData;
+    return api;
 }
 
 export async function createCvApi(
-    payload: ReturnType<typeof mapCVDataToApiPayload>,
+    payload: CVData,
     accessToken: string
 ): Promise<CVData | null> {
     const baseUrl = getBaseUrl();
+    const body = buildSavePayload(payload);
     const res = await fetch(`${baseUrl}/cvs`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(body),
     });
-    if (!res.ok) return null;
-    const api = (await res.json()) as ApiCv;
-    return mapApiCvToCVData(api);
+    if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        const msg =
+            (errBody as { error?: string }).error ??
+            (errBody as { message?: string }).message ??
+            "Erreur lors de la création";
+        throw new Error(msg);
+    }
+    const api = (await res.json()) as CVData;
+    return api;
 }
 
 export async function updateCvApi(
     cvId: string,
-    payload: ReturnType<typeof mapCVDataToApiPayload>,
+    payload: CVData,
     accessToken: string
 ): Promise<CVData | null> {
     const baseUrl = getBaseUrl();
+    const body = buildSavePayload(payload);
     const res = await fetch(`${baseUrl}/cvs/${cvId}`, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(body),
     });
-    if (!res.ok) return null;
-    const api = (await res.json()) as ApiCv;
-    return mapApiCvToCVData(api);
+    if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        const msg =
+            (errBody as { error?: string }).error ??
+            (errBody as { message?: string }).message ??
+            "Erreur lors de la mise à jour";
+        throw new Error(msg);
+    }
+    const api = (await res.json()) as CVData;
+    return api;
 }
 
-function mapApiItemToCVListItem(api: ApiCvListItem | ApiCv): ApiCvListItem {
-    const item = api as ApiCvListItem & { fullName?: string; jobTitle?: string; updatedAt?: string; currentStep?: number; completed?: boolean };
-    return {
-        id: item.id,
-        title: item.title,
-        template: item.template,
-        fullName: item.fullName ?? (api as ApiCv).fullName ?? "",
-        jobTitle: item.jobTitle ?? (api as ApiCv).jobTitle ?? "",
-        updatedAt: item.updatedAt ?? (api as ApiCv).updatedAt ?? new Date().toISOString(),
-        currentStep: item.currentStep ?? (api as ApiCv).currentStep,
-        completed: item.completed ?? (api as ApiCv).completed,
-    };
-}
-
-export async function listCvsApi(accessToken: string): Promise<ApiCvListItem[]> {
+export async function listCvsApi(accessToken: string): Promise<CVListItem[]> {
     const baseUrl = getBaseUrl();
     const res = await fetch(`${baseUrl}/cvs`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         cache: "no-store",
     });
     if (!res.ok) return [];
-    const data = (await res.json()) as ApiCvListItem[] | ApiCv[];
-    const list = Array.isArray(data) ? data : [];
-    return list.map(mapApiItemToCVListItem).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+    const data = await res.json();
+    return data.map((item: CVData) => mapApiItemToCVListItem(item)).sort((a: CVListItem, b: CVListItem) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 }
 
 export async function deleteCvApi(cvId: string, accessToken: string): Promise<boolean> {

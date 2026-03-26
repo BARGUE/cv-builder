@@ -6,11 +6,11 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger,
 } from "@/src/components/ui/dialog";
 import { Eye, EyeOff, Lock } from "lucide-react";
-import toast from "react-hot-toast";
-import { useCVContext } from "@/src/context/CVContext";
+import { myToast } from "@/src/components/ui/toast";
+import { updatePasswordAction } from "@/src/app/actions/profile";
+import type { PasswordChangeModalProps } from "@/src/components/account/types";
 
-const PasswordChangeModal = () => {
-  const { handleUnauthorized } = useCVContext();
+const PasswordChangeModal = ({ onUnauthorized }: PasswordChangeModalProps) => {
   const [open, setOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -19,36 +19,31 @@ const PasswordChangeModal = () => {
 
   const handleSubmit = async () => {
     if (newPassword.length < 6) {
-      toast.error("Le mot de passe doit contenir au moins 6 caractères.");
+      myToast.error("Le mot de passe doit contenir au moins 6 caractères.");
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error("Les mots de passe ne correspondent pas.");
+      myToast.error("Les mots de passe ne correspondent pas.");
       return;
     }
 
     setLoading(true);
     try {
-      const res = await fetch("/api/password", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ newPassword }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.status === 401 && handleUnauthorized) {
-        handleUnauthorized();
+      const result = await updatePasswordAction(newPassword);
+      if (!result.success) {
+        if (result.error === "Non authentifié" && onUnauthorized) {
+          onUnauthorized();
+          return;
+        }
+        myToast.error(result.error);
         return;
       }
-      if (!res.ok) {
-        toast.error((data as { error?: string }).error ?? "Erreur lors du changement de mot de passe.");
-        return;
-      }
-      toast.success("Mot de passe modifié avec succès !");
+      myToast.success("Mot de passe modifié avec succès !");
       setNewPassword("");
       setConfirmPassword("");
       setOpen(false);
     } catch {
-      toast.error("Erreur lors du changement de mot de passe.");
+      myToast.error("Erreur lors du changement de mot de passe.");
     } finally {
       setLoading(false);
     }
@@ -79,13 +74,15 @@ const PasswordChangeModal = () => {
                 placeholder="••••••••"
                 maxLength={72}
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute hover:bg-transparent cursor-pointer right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground h-8 w-8"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
+              </Button>
             </div>
           </div>
           <div className="space-y-2">

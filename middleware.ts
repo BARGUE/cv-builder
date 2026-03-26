@@ -8,17 +8,22 @@ function isProtectedPath(pathname: string): boolean {
 
 export function middleware(req: NextRequest) {
     const { pathname } = req.nextUrl;
+    const token = req.cookies.get("access_token")?.value;
+
+    // Si authentifié et sur la page d'accueil → redirection vers le dashboard
+    if (pathname === "/" && token) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
     if (!isProtectedPath(pathname)) {
         return NextResponse.next();
     }
-    const token = req.cookies.get("access_token")?.value;
     if (!token) {
-        const authUrl = new URL("/", req.url);
-        return NextResponse.redirect(authUrl);
+        return NextResponse.redirect(new URL("/", req.url));
     }
     return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/dashboard", "/account", "/cv", "/cv/:path*"],
+    matcher: ["/", "/dashboard", "/account", "/cv", "/cv/:path*"],
 };

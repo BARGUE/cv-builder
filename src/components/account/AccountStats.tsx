@@ -3,29 +3,10 @@
 import { useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { FileText, Calendar, TrendingUp } from "lucide-react";
-import { useCVContext } from "@/src/context/CVContext";
+import type { AccountStatsProps } from "@/src/components/account/types";
+import { getTemplateColor } from "@/src/lib/utils";
 
-interface Props {
-  userId: string;
-}
-
-const TEMPLATE_COLORS: Record<string, string> = {
-  classic: "#3b82f6",
-  modern: "#8b5cf6",
-  minimal: "#10b981",
-  creative: "#f59e0b",
-  professional: "#ef4444",
-  elegant: "#ec4899",
-};
-
-const getTemplateColor = (name: string, index: number) => {
-  const fallback = ["#6366f1", "#14b8a6", "#f97316", "#e11d48", "#0ea5e9"];
-  return TEMPLATE_COLORS[name.toLowerCase()] || fallback[index % fallback.length];
-};
-
-const AccountStats = ({ userId }: Props) => {
-  const { cvs, cvsLoading } = useCVContext();
-
+const AccountStats = ({ cvs }: AccountStatsProps) => {
   const { totalCvs, templateData, monthlyData, lastActivity } = useMemo(() => {
     const totalCvs = cvs.length;
 
@@ -61,14 +42,6 @@ const AccountStats = ({ userId }: Props) => {
 
     return { totalCvs, templateData, monthlyData, lastActivity };
   }, [cvs]);
-
-  if (cvsLoading) {
-    return (
-      <div className="space-y-6 flex items-center justify-center py-12 text-muted-foreground">
-        Chargement des statistiques…
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

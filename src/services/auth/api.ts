@@ -1,4 +1,12 @@
-import type { AuthCredentials, AuthApiResponse, MeResponse } from "./types";
+import type {
+    AuthCredentials,
+    AuthApiResponse,
+    MeResponse,
+    LoginResult,
+    RegisterResult,
+    UpdateProfilePayload,
+    SessionExpiredError,
+} from "./types";
 
 const AUTH_API_URL = process.env.AUTH_API_URL;
 
@@ -24,11 +32,6 @@ function parseApiError(body: unknown): string {
     return "Erreur inconnue";
 }
 
-export interface LoginResult {
-    accessToken: string;
-    user?: unknown;
-}
-
 export async function loginApi(credentials: AuthCredentials): Promise<LoginResult> {
     const baseUrl = getBaseUrl();
     const res = await fetch(`${baseUrl}/auth/login`, {
@@ -48,11 +51,6 @@ export async function loginApi(credentials: AuthCredentials): Promise<LoginResul
         throw new Error("Réponse API invalide");
     }
     return { accessToken, user: data.user };
-}
-
-export interface RegisterResult {
-    accessToken: string;
-    user?: unknown;
 }
 
 export async function registerApi(credentials: AuthCredentials): Promise<RegisterResult> {
@@ -82,27 +80,34 @@ export async function registerApi(credentials: AuthCredentials): Promise<Registe
     return { accessToken, user: data.user };
 }
 
-export async function getMe(accessToken: string): Promise<MeResponse | null> {
+export function createSessionExpiredError(): SessionExpiredError {
+    const err = new Error("Session expirée") as SessionExpiredError;
+    err.name = "SessionExpiredError";
+    return err;
+}
+
+export function isSessionExpiredError(e: unknown): e is SessionExpiredError {
+    return e instanceof Error && e.name === "SessionExpiredError";
+}
+
+export async function getMe(accessToken: string): Promise<MeResponse> {
     const baseUrl = getBaseUrl();
     const res = await fetch(`${baseUrl}/me`, {
         headers: { Authorization: `Bearer ${accessToken}` },
         cache: "no-store",
     });
+    if (res.status === 401) {
+        throw createSessionExpiredError();
+    }
     if (!res.ok) {
-        return null;
+        throw new Error("Erreur lors de la récupération du profil");
     }
     return (await res.json()) as MeResponse;
 }
 
-export interface UpdateProfileBody {
-    firstName?: string;
-    lastName?: string;
-    avatarUrl?: string;
-}
-
 export async function updateProfileApi(
     accessToken: string,
-    body: UpdateProfileBody,
+    body: UpdateProfilePayload,
 ): Promise<MeResponse["profile"]> {
     const baseUrl = getBaseUrl();
     const res = await fetch(`${baseUrl}/me/profile`, {

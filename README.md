@@ -87,10 +87,10 @@ L’application ne stocke pas les données elle-même : elle s’appuie sur une 
 
 Les variables d’environnement se mettent dans **`.env.local`** (ce fichier est ignoré par Git).
 
-| Variable         | Obligatoire | Description |
-|------------------|-------------|-------------|
-| `AUTH_API_URL`   | **Oui**     | URL de base de l’API backend (ex. `http://localhost:3000` ou `https://api.example.com`). Utilisée pour l’auth et les appels CV. |
-| `PRINT_SECRET`   | Non         | Secret partagé pour sécuriser l’endpoint d’impression `/api/cv-print`. Si absent, l’endpoint renverra 401. |
+| Variable       | Obligatoire | Description                                                                                                                     |
+| -------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `AUTH_API_URL` | **Oui**     | URL de base de l’API backend (ex. `http://localhost:3000` ou `https://api.example.com`). Utilisée pour l’auth et les appels CV. |
+| `PRINT_SECRET` | Non         | Secret partagé pour sécuriser l’endpoint d’impression `/api/cv-print`. Si absent, l’endpoint renverra 401.                      |
 
 **Exemple `.env.local` :**
 
@@ -105,12 +105,12 @@ Pour un **démarrage rapide** sans backend, vous pouvez pointer `AUTH_API_URL` v
 
 ## Commandes
 
-| Commande           | Description |
-|--------------------|-------------|
-| `npm run dev`      | Lance le serveur de développement Next.js (Turbopack). Rechargement à chaud. |
-| `npm run build`    | Compile l’application pour la production (sortie dans `.next`). |
-| `npm run start`    | Démarre le serveur de production (à utiliser après `npm run build`). |
-| `npm run lint`     | Exécute ESLint sur le code. |
+| Commande        | Description                                                                  |
+| --------------- | ---------------------------------------------------------------------------- |
+| `npm run dev`   | Lance le serveur de développement Next.js (Turbopack). Rechargement à chaud. |
+| `npm run build` | Compile l’application pour la production (sortie dans `.next`).              |
+| `npm run start` | Démarre le serveur de production (à utiliser après `npm run build`).         |
+| `npm run lint`  | Exécute ESLint sur le code.                                                  |
 
 **Exemples :**
 
@@ -135,7 +135,7 @@ cv-builder/
 ├── src/
 │   ├── app/                    # App Router Next.js
 │   │   ├── page.tsx            # Page d’accueil (landing)
-│   │   ├── layout.tsx          # Layout racine (CVProvider, Toaster)
+│   │   ├── layout.tsx          # Layout racine (CVProvider, myToaster)
 │   │   ├── globals.css         # Styles globaux
 │   │   ├── auth/               # Connexion / Inscription
 │   │   │   ├── page.tsx
@@ -207,16 +207,16 @@ cv-builder/
 
 ## Routes et pages
 
-| Route | Accès | Description |
-|-------|--------|-------------|
-| `/` | Public | Page d’accueil (landing). |
-| `/auth` | Public | Redirection vers login/register. |
-| `/auth/login` | Public | Connexion. |
-| `/auth/register` | Public | Inscription. |
-| `/dashboard` | Protégé | Liste des CV, création d’un nouveau CV. |
-| `/account` | Protégé | Compte utilisateur (profil, avatar, mot de passe). |
-| `/cv/[id]` | Protégé | Éditeur du CV `[id]`. |
-| `/cv/[id]/print` | Protégé | Page d’impression du CV. |
+| Route            | Accès   | Description                                        |
+| ---------------- | ------- | -------------------------------------------------- |
+| `/`              | Public  | Page d’accueil (landing).                          |
+| `/auth`          | Public  | Redirection vers login/register.                   |
+| `/auth/login`    | Public  | Connexion.                                         |
+| `/auth/register` | Public  | Inscription.                                       |
+| `/dashboard`     | Protégé | Liste des CV, création d’un nouveau CV.            |
+| `/account`       | Protégé | Compte utilisateur (profil, avatar, mot de passe). |
+| `/cv/[id]`       | Protégé | Éditeur du CV `[id]`.                              |
+| `/cv/[id]/print` | Protégé | Page d’impression du CV.                           |
 
 Les routes **protégées** sont définies dans `middleware.ts` : en l’absence du cookie `access_token`, l’utilisateur est redirigé vers `/`.
 
@@ -248,7 +248,7 @@ L’endpoint **`/api/cv-print`** (Next.js) génère du HTML pour l’impression 
 - **Animations** : Framer Motion
 - **Export** : jsPDF, html-to-image
 - **Graphiques** : Recharts (ex. dashboard)
-- **Notifications** : react-hot-toast
+- **Notifications** : react-hot-myToast
 - **Langage** : TypeScript
 
 ---
@@ -261,4 +261,4 @@ L’endpoint **`/api/cv-print`** (Next.js) génère du HTML pour l’impression 
 
 ---
 
-*README généré pour faciliter l’onboarding sur le projet CVBuilder.*
+_README généré pour faciliter l’onboarding sur le projet CVBuilder._
