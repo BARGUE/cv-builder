@@ -1,0 +1,678 @@
+{
+  "brand": "CVBuilder",
+  "homePage": {
+    "title": "Create a resume online with ease",
+    "description": "Create a resume in just a few minutes with our recruiter-approved templates. 6 professional templates, real-time preview."
+  },
+  "common": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "continue": "Continue",
+    "save": "Save",
+    "delete": "Delete",
+    "change": "Change",
+    "loading": "Loading...",
+    "sending": "Sending…",
+    "uploadInProgress": "Upload in progress...",
+    "noName": "No name",
+    "yourName": "Your Name",
+    "yourTitle": "Your Title",
+    "photoAlt": "Photo",
+    "present": "Present",
+    "defaultCvFilename": "Resume",
+    "selectDatePlaceholder": "Select",
+    "selectDateTitle": "Select a date"
+  },
+  "header": {
+    "login": "Log in",
+    "registerCta": "Get Started →"
+  },
+  "footer": {
+    "disclaimer": "*The names and logos of the companies mentioned above are registered trademarks owned by their respective holders. Unless otherwise stated, these references are not intended in any way to suggest any affiliation or association with CVBuilder.",
+    "servicesTitle": "Services",
+    "createCv": "Create a Resume",
+    "createCoverLetter": "Create a Cover Letter",
+    "aboutTitle": "About",
+    "contactUs": "Contact Us",
+    "terms": "Terms and Conditions of Sale",
+    "privacy": "Privacy Policy",
+    "langFr": "FR",
+    "langEn": "EN"
+  },
+  "hero": {
+    "socialProofHighlight": "+1,000",
+    "socialProofRest": "satisfied users",
+    "titleLine1": "Create a resume online",
+    "titleLine2": "with ease",
+    "description": "Create a resume in just a few minutes with our recruiter-approved templates. 6 professional templates, real-time preview.",
+    "createMyCv": "Create my Resume",
+    "alreadyHaveAccount": "I already have an account",
+    "stat100": "100%",
+    "stat100Label": "free",
+    "stat6": "6",
+    "stat6Label": "templates",
+    "stat5min": "5 min",
+    "stat5minLabel": "to create",
+    "heroImageAlt": "User creating her resume"
+  },
+  "marquee": {
+    "items": [
+      "Classic",
+      "Modern",
+      "Creative",
+      "Compact",
+      "Executive",
+      "Sidebar",
+      "PDF Export",
+      "Profile Photo",
+      "Skills",
+      "Languages"
+    ]
+  },
+  "appMockup": {
+    "kicker": "The editor",
+    "title": "Everything in one place.",
+    "urlBar": "cvbuilder.app/cv/edit"
+  },
+  "howItWorks": {
+    "title": "Create your resume in",
+    "titleHighlight": "4 steps",
+    "steps": [
+      "Choose a recruiter-approved\ntemplate.",
+      "Complete your resume\nwith real-time preview.",
+      "Customize the design\nto your liking.",
+      "Download your resume and\nstart applying."
+    ],
+    "cta": "Create my resume online"
+  },
+  "ctaSection": {
+    "kicker": "Ready to get started?",
+    "titleLine1": "Your next",
+    "titleLine2": "job is waiting for you.",
+    "button": "Create my resume for free",
+    "footnote": "No credit card required."
+  },
+  "floatingCard": {
+    "sampleName": "Elsa Monet",
+    "sampleJob": "Sales Advisor",
+    "experienceSection": "Work Experience",
+    "educationSection": "Degrees and Education",
+    "skillsLabel": "Skills",
+    "importCv": "Import my Resume",
+    "prewrittenContent": "Pre-written content"
+  },
+  "contact": {
+    "heroTitle": "We are here to",
+    "heroTitleHighlight": "help you",
+    "heroSubtitle": "A question, a suggestion, or need help? Our team will get back to you within 24 hours.",
+    "cards": {
+      "email": {
+        "title": "Email",
+        "value": "contact@cvbuilder.fr",
+        "hint": "Reply within 24h"
+      },
+      "location": {
+        "title": "Location",
+        "value": "Paris, France",
+        "hint": "100% online"
+      },
+      "hours": {
+        "title": "Hours",
+        "value": "Mon – Fri, 9am – 6pm",
+        "hint": "Paris time (CET)"
+      }
+    },
+    "formTitle": "Send us a message",
+    "formSubtitle": "Fill out the form below and we will get back to you quickly.",
+    "fields": {
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Jean Dupont",
+      "email": "Email",
+      "emailPlaceholder": "jean@email.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "e.g. PDF download issue",
+      "message": "Message",
+      "messagePlaceholder": "Describe your request in detail…"
+    },
+    "submit": "Send message",
+    "supportCard": {
+      "title": "Priority support",
+      "description": "Need a quick response? Our team prioritizes urgent requests.",
+      "learnMore": "Learn more"
+    },
+    "faqTitle": "Frequently Asked Questions",
+    "faqHint": "Click on a question to see the answer",
+    "faq": [
+      {
+        "q": "How do I export my resume as a PDF?",
+        "a": "Go to your resume editor, then click the “Download PDF” button in the top right. The file will be generated instantly with the exact same layout as your preview."
+      },
+      {
+        "q": "Can I change the template afterward?",
+        "a": "Absolutely! You can change the template at any time from the editor without losing your information. All your content will be automatically adapted to the new design."
+      },
+      {
+        "q": "Is my data secure?",
+        "a": "Yes, all your data is encrypted and securely stored. We comply with GDPR and never share your information with third parties."
+      },
+      {
+        "q": "How do I delete my account?",
+        "a": "Contact us through this form with the subject “Account Deletion” and we will process your request within 48 hours, in accordance with your GDPR rights."
+      }
+    ],
+    "toast": {
+      "successTitle": "Message sent successfully",
+      "successDescription": "We will get back to you quickly.",
+      "errorTitle": "Error while sending",
+      "errorDescription": "Please try again later.",
+      "sendError": "Error while sending"
+    }
+  },
+  "dashboard": {
+    "sidebarDocuments": "Documents",
+    "logout": "Log out",
+    "pageTitle": "Documents",
+    "pageSubtitle": "Manage and create your resumes",
+    "newCv": "New Resume",
+    "tabCvs": "Resumes",
+    "tabCoverLetters": "Cover Letters",
+    "emptyTitle": "You don't have a resume yet.",
+    "emptyDescription": "Create your first resume in just a few minutes and download it as a PDF.",
+    "createFirstCv": "Create my first Resume",
+    "completed": "Completed",
+    "toastDeleted": "Resume deleted",
+    "toastPdfOk": "PDF downloaded!"
+  },
+  "account": {
+    "sidebarDocuments": "Documents",
+    "sidebarAccount": "My Account",
+    "logout": "Log out",
+    "pageTitle": "My Account",
+    "pageSubtitle": "Manage your profile and preferences",
+    "avatarAlt": "Avatar",
+    "personalInfo": "Personal Information",
+    "firstName": "First name",
+    "firstNamePlaceholder": "Jean",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "Dupont",
+    "emailLabel": "Email address",
+    "saveProfile": "Save changes",
+    "saving": "Saving...",
+    "security": "Security",
+    "securityDescription": "Update your password to secure your account.",
+    "statsTitle": "Statistics",
+    "stats": {
+      "cvsCreated": "Resumes created",
+      "templatesUsed": "Templates used",
+      "lastActivity": "Last activity",
+      "activityChartTitle": "Activity over the last 6 months",
+      "templateDistribution": "Distribution by template"
+    },
+    "toasts": {
+      "mustBeLoggedInPhoto": "You must be logged in to change your photo.",
+      "fileMustBeImage": "The file must be an image (JPEG, PNG, GIF, etc.).",
+      "imageMaxSize": "The image must not exceed 2 MB.",
+      "photoLoaded": "Photo loaded. Click “Save” to apply it.",
+      "cannotReadImage": "Unable to read the image.",
+      "readFileError": "Error while reading the file. Try again with another image.",
+      "readAborted": "File read canceled.",
+      "unexpectedError": "Unexpected error",
+      "cannotLoadImage": "Unable to load image: {message}",
+      "unauthenticated": "Unauthenticated",
+      "profileUpdated": "Profile updated!",
+      "saveError": "Error while saving."
+    }
+  },
+  "passwordModal": {
+    "trigger": "Change password",
+    "title": "Change password",
+    "description": "Enter your new password below.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "toasts": {
+      "minLength": "The password must contain at least 6 characters.",
+      "mismatch": "Passwords do not match.",
+      "success": "Password changed successfully!",
+      "error": "Error while changing password.",
+      "modifying": "Updating..."
+    }
+  },
+  "auth": {
+    "back": "Back",
+    "loginTitle": "Log in",
+    "registerTitleLine1": "Create an account to",
+    "registerTitleHighlight": "Get your Resume",
+    "loginSubtitle": "Welcome back!",
+    "registerSubtitle": "Sign up with your email to save, edit, and download your resume.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email address",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "submitLogin": "Log in",
+    "submitRegister": "Get your Resume",
+    "submitLoading": "Loading...",
+    "toggleLoginPrompt": "Don't have an account yet? ",
+    "toggleRegisterPrompt": "Already have an account? ",
+    "toggleToRegister": "Sign up",
+    "toggleToLogin": "Log in",
+    "errors": {
+      "emailPasswordRequired": "Email and password required",
+      "passwordMin": "The password must contain at least {min} characters",
+      "nameRequired": "First name and last name required",
+      "generic": "An error occurred"
+    },
+    "toast": {
+      "loginOk": "Logged in successfully",
+      "registerOk": "Signed up successfully"
+    }
+  },
+  "cvStart": {
+    "backToDashboard": "Back to dashboard",
+    "title": "How would you like to start your resume?",
+    "fromScratchTitle": "Create a new\nresume from scratch",
+    "fromScratchDescription": "Step-by-step guidance to create a top-notch resume.",
+    "importBadge": "90% faster",
+    "importTitle": "Import my existing\nresume",
+    "importDescription": "Benefit from expert advice to improve your resume."
+  },
+  "cvImport": {
+    "back": "Back",
+    "title": "Import your existing resume",
+    "subtitle": "Benefit from expert advice to improve your resume.",
+    "dropTitle": "Drag and drop a file here",
+    "formatsHint": "Accepted format: PDF, DOCX",
+    "pdfOnlyError": "PDF only for now",
+    "importButton": "Import",
+    "scanningTitle": "We are importing your resume...",
+    "scanningSubtitle": "We are organizing your information and applying your template.",
+    "analysisDone": "Resume analysis completed",
+    "analysisInProgress": "Resume analysis in progress...",
+    "doneTitle": "Import is complete!",
+    "doneSubtitle": "Start reviewing and improving your resume.",
+    "doneImageAlt": "Import successful",
+    "errors": {
+      "analysisFailed": "Error while analyzing the resume.",
+      "importFailed": "Error during import.",
+      "sessionExpired": "Session expired. Please log in again."
+    }
+  },
+  "cvEditor": {
+    "backToDashboard": "Back to dashboard",
+    "progress": "Progress",
+    "stepBadge": "Step {step}",
+    "changeTemplate": "Change template",
+    "templateModalTitle": "Change template",
+    "accentColor": "Accent color",
+    "footer": {
+      "previous": "Previous",
+      "dashboard": "Dashboard",
+      "saved": "Saved",
+      "save": "Save",
+      "next": "Next",
+      "pdf": "PDF",
+      "finish": "Finish"
+    },
+    "toasts": {
+      "pdfOk": "PDF downloaded!",
+      "pdfError": "Error while generating the PDF",
+      "saved": "Resume saved!",
+      "noChanges": "No changes to save"
+    },
+    "steps": [
+      {
+        "label": "Contact Details"
+      },
+      {
+        "label": "Work Experience"
+      },
+      {
+        "label": "Degrees and Education"
+      },
+      {
+        "label": "Skills"
+      },
+      {
+        "label": "Summary"
+      },
+      {
+        "label": "Other Sections"
+      },
+      {
+        "label": "Finalize"
+      }
+    ],
+    "stepTitles": {
+      "1": {
+        "title": "Let's start with your contact details",
+        "subtitle": "To help employers contact you, we recommend adding your name, email, and phone number."
+      },
+      "2": {
+        "title": "Work Experience",
+        "subtitle": "Add your most recent and relevant experience."
+      },
+      "3": {
+        "title": "Degrees and Education",
+        "subtitle": "List your relevant degrees and education."
+      },
+      "4": {
+        "title": "Skills",
+        "subtitle": "List your key skills and assess your level."
+      },
+      "5": {
+        "title": "Professional Summary",
+        "subtitle": "Write a short summary that highlights your profile."
+      },
+      "6": {
+        "title": "Other Sections",
+        "subtitle": "Add languages or other additional information."
+      },
+      "7": {
+        "title": "Finalize your resume",
+        "subtitle": "Choose your template and give your resume a title."
+      }
+    },
+    "step1": {
+      "photoIdentity": "Photo & identity",
+      "addPhoto": "Add a photo",
+      "contact": "Contact",
+      "fullName": "Full name *",
+      "fullNamePlaceholder": "e.g. John Doe",
+      "jobTitle": "Job title *",
+      "jobTitlePlaceholder": "e.g. Web Developer",
+      "phone": "Phone *",
+      "phonePlaceholder": "e.g. 06 12 34 56 78",
+      "email": "Email *",
+      "emailPlaceholder": "e.g. john@example.com",
+      "city": "City *",
+      "cityPlaceholder": "e.g. Paris, France"
+    },
+    "step2": {
+      "experienceN": "Experience {n}",
+      "company": "Company *",
+      "companyPlaceholder": "e.g. Google",
+      "position": "Position *",
+      "positionPlaceholder": "e.g. Senior Developer",
+      "startDate": "Start date *",
+      "startPlaceholder": "e.g. Jan 2020",
+      "endDate": "End date",
+      "endPlaceholder": "e.g. Present",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe your responsibilities...",
+      "addExperience": "Add experience"
+    },
+    "step3": {
+      "formationN": "Education {n}",
+      "school": "School / University *",
+      "schoolPlaceholder": "e.g. Paris-Saclay University",
+      "degree": "Degree *",
+      "degreePlaceholder": "e.g. Master's in Computer Science",
+      "startDate": "Start date *",
+      "startPlaceholder": "e.g. Sep 2018",
+      "endDate": "End date",
+      "endPlaceholder": "e.g. Jun 2020",
+      "addFormation": "Add education"
+    },
+    "step4": {
+      "skillPlaceholder": "e.g. JavaScript",
+      "addSkill": "Add a skill"
+    },
+    "step5": {
+      "label": "Professional summary *",
+      "placeholder": "Describe yourself in a few sentences. Highlight your strengths and the value you bring...",
+      "charCount": "{count} / 2000 characters"
+    },
+    "step6": {
+      "languagePlaceholder": "e.g. English",
+      "addLanguage": "Add a language"
+    },
+    "step7": {
+      "cvTitle": "Resume title",
+      "cvTitlePlaceholder": "e.g. My Developer Resume",
+      "template": "Template"
+    },
+    "languageLevels": [
+      "Beginner",
+      "Intermediate",
+      "Advanced",
+      "Fluent",
+      "Native"
+    ],
+    "defaults": {
+      "cvTitle": "My Resume"
+    }
+  },
+  "templates": {
+    "classic": "Classic",
+    "modern": "Modern",
+    "creative": "Creative",
+    "compact": "Compact",
+    "executive": "Executive",
+    "sidebar": "Sidebar",
+    "minimaliste": "Minimalist",
+    "playfair": "Creative Playfair",
+    "tech": "Tech"
+  },
+  "accentColors": {
+    "indigo": "Indigo",
+    "blue": "Blue",
+    "green": "Green",
+    "red": "Red",
+    "orange": "Orange",
+    "violet": "Violet",
+    "pink": "Pink",
+    "gray": "Gray"
+  },
+  "preview": {
+    "profile": "Profile",
+    "experience": "Experience",
+    "experienceFull": "Work Experience",
+    "education": "Education",
+    "skills": "Skills",
+    "languages": "Languages",
+    "about": "About"
+  },
+  "date": {
+    "monthsShort": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
+    "monthsScroll": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "June",
+      "July",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ]
+  },
+  "validation": {
+    "phoneRequired": "Phone required",
+    "phoneMax": "Maximum 14 characters",
+    "phoneDigitsOnly": "Digits only (and spaces)",
+    "phoneMinDigits": "At least 10 digits",
+    "emailRequired": "Email required",
+    "emailInvalid": "Invalid email",
+    "fieldRequired": "Required field",
+    "summaryRequired": "Summary required",
+    "maxChars2000": "Maximum 2000 characters"
+  },
+  "serverErrors": {
+    "unauthenticated": "Unauthenticated",
+    "cvCreateError": "Error while creating",
+    "cvUpdateError": "Error while updating",
+    "cvDeleteError": "Error while deleting",
+    "profileNotFound": "Profile not found",
+    "passwordMinServer": "The password must contain at least 6 characters.",
+    "passwordChangeError": "Error while changing password",
+    "authEmailPasswordRequired": "Email and password required",
+    "authNameRequiredRegister": "First name and last name required for registration",
+    "invalidCredentials": "Invalid credentials",
+    "registrationDenied": "Registration denied",
+    "contact": {
+      "configMissing": "Missing server configuration (AUTH_API_URL)",
+      "invalidBody": "Invalid body",
+      "missingFields": "Required fields missing",
+      "sendError": "Error while sending",
+      "unavailable": "Service temporarily unavailable"
+    },
+    "pdf": {
+      "cannotLoadCv": "Unable to load the resume",
+      "pdfGenerationError": "Error while generating the PDF",
+      "cvLoadError": "Error while loading the resume"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "heroTitle": "Privacy",
+      "heroTitleHighlight": "Policy",
+      "heroSubtitle": "Last updated: March 12, 2026 — Your data is our priority.",
+      "trustBar": [
+        {
+          "label": "Encryption",
+          "desc": "AES-256 in transit and at rest"
+        },
+        {
+          "label": "GDPR Compliance",
+          "desc": "Compliant with European standards"
+        },
+        {
+          "label": "No resale",
+          "desc": "Your data is never sold"
+        }
+      ],
+      "sections": [
+        {
+          "title": "1. Data collection",
+          "content": "As part of using CVBuilder, we collect the following personal data: first name, last name, email address, phone number, postal address, and professional and academic information entered in resumes."
+        },
+        {
+          "title": "2. Purposes of processing",
+          "content": "The collected data is used for:",
+          "list": [
+            "Creating and managing your user account",
+            "Generating and storing your resumes",
+            "Improving our services and user experience",
+            "Sending communications related to the service"
+          ]
+        },
+        {
+          "title": "3. Legal basis",
+          "content": "The processing of your data is based on contract performance (provision of the service) and, where applicable, your consent for marketing communications."
+        },
+        {
+          "title": "4. Retention period",
+          "content": "Your personal data is retained for the entire duration of your registration and for 3 years after the last activity on your account. Beyond that, your data will be deleted or anonymized."
+        },
+        {
+          "title": "5. Data sharing",
+          "content": "Your data is not sold to third parties. It may be shared with our technical processors (hosting, infrastructure) strictly for the purpose of providing the service, and in compliance with GDPR."
+        },
+        {
+          "title": "6. Security",
+          "content": "We implement appropriate technical and organizational measures to protect your data against any unauthorized access, alteration, disclosure, or destruction. Data is encrypted in transit and at rest."
+        },
+        {
+          "title": "7. Your rights",
+          "content": "In accordance with GDPR, you have the following rights:",
+          "rights": [
+            {
+              "label": "Right of access",
+              "desc": "Obtain a copy of your personal data"
+            },
+            {
+              "label": "Right to rectification",
+              "desc": "Correct your inaccurate data"
+            },
+            {
+              "label": "Right to erasure",
+              "desc": "Request the deletion of your data"
+            },
+            {
+              "label": "Right to portability",
+              "desc": "Receive your data in a structured format"
+            },
+            {
+              "label": "Right to object",
+              "desc": "Object to the processing of your data"
+            }
+          ]
+        },
+        {
+          "title": "8. Cookies",
+          "content": "CVBuilder uses cookies that are strictly necessary for the operation of the service (authentication, preferences). No advertising cookies are used without your explicit consent."
+        },
+        {
+          "title": "9. Contact",
+          "content": "For any questions regarding the protection of your data, you can write to us at contact@cvbuilder.fr or via our contact page."
+        }
+      ],
+      "ctaTitle": "Exercise your rights",
+      "ctaDescription": "Contact our data protection officer for any request related to your GDPR rights.",
+      "ctaButton": "Contact Us"
+    },
+    "terms": {
+      "heroTitle": "Terms and Conditions",
+      "heroTitleHighlight": "of Sale",
+      "heroSubtitle": "Last updated: March 12, 2026",
+      "sections": [
+        {
+          "title": "1. Purpose",
+          "content": "These Terms and Conditions of Sale (T&Cs) govern the contractual relationship between CVBuilder (hereinafter the “Service”) and any individual or legal entity (hereinafter the “User”) wishing to use the services offered on the website cvbuilder.fr."
+        },
+        {
+          "title": "2. Services offered",
+          "content": "CVBuilder offers an online service for creating, editing, and downloading resumes. Features include entering personal information, choosing templates, graphic customization, and exporting in PDF format."
+        },
+        {
+          "title": "3. Registration and user account",
+          "content": "Access to the services requires the creation of an account. The User agrees to provide accurate information and to maintain the confidentiality of their login credentials. Any use of the account is deemed to have been carried out by the User."
+        },
+        {
+          "title": "4. Pricing and payment",
+          "content": "Service prices are indicated in euros, all taxes included (TTC). Payment is made online using the payment methods accepted on the platform. CVBuilder reserves the right to modify its prices at any time, with the new pricing conditions applying to orders placed after the modification."
+        },
+        {
+          "title": "5. Right of withdrawal",
+          "content": "In accordance with Article L221-28 of the French Consumer Code, the right of withdrawal cannot be exercised for contracts for the supply of digital content not provided on a tangible medium, the performance of which has begun with the consumer’s prior express agreement."
+        },
+        {
+          "title": "6. Intellectual property",
+          "content": "All elements of the website (design, texts, images, software) are protected by intellectual property law. Resumes created by users remain their property. CVBuilder retains ownership of its templates and technology."
+        },
+        {
+          "title": "7. Liability",
+          "content": "CVBuilder undertakes to use all necessary means to ensure the continuity and quality of the service. However, CVBuilder cannot be held liable for service interruptions, data loss, or any indirect damage resulting from the use of the service."
+        },
+        {
+          "title": "8. Termination",
+          "content": "The User may terminate their account at any time from their personal space. CVBuilder reserves the right to suspend or terminate an account in the event of a breach of these T&Cs."
+        },
+        {
+          "title": "9. Governing law",
+          "content": "These T&Cs are governed by French law. Any dispute relating to their interpretation or execution falls under the jurisdiction of the French courts."
+        }
+      ],
+      "ctaTitle": "Questions about our terms?",
+      "ctaDescription": "Our team is available to answer all your questions.",
+      "ctaButton": "Contact Us"
+    }
+  }
+}

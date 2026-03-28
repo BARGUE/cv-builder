@@ -1,11 +1,13 @@
 import type { NextConfig } from "next";
 import path from "node:path";
+import createNextIntlPlugin from "next-intl/plugin";
 
 const jspdfEsmRelative  = "./node_modules/jspdf/dist/jspdf.es.min.js";
 const jspdfEsmAbsolute = path.join(
   process.cwd(),
   "node_modules/jspdf/dist/jspdf.es.min.js"
 );
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   experimental: {
@@ -32,4 +34,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

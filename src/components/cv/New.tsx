@@ -23,7 +23,7 @@ import { useForm, FormProvider, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TEMPLATES } from "@/src/lib/utils";
 import TemplateModal from "./modal/template";
-import { createCvAction, updateCvAction } from "@/src/app/actions/cv";
+import { createCvAction, updateCvAction } from "@/src/app/[locale]/actions/cv";
 import { cvDataSchema } from "@/src/lib/validations/cv";
 import { myToast } from "@/src/components/ui/toast";
 

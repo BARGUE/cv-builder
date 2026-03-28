@@ -21,8 +21,8 @@ import CVPreview from "@/src/components/cv/Preview";
 import { CVListItem, CVData } from "@/src/types/cv";
 import { dashboardDownloadPdf } from "@/src/lib/pdf";
 import { myToast } from "@/src/components/ui/toast";
-import { logoutAction } from "@/src/app/actions/auth";
-import { deleteCvAction } from "@/src/app/actions/cv";
+import { logoutAction } from "@/src/app/[locale]/actions/auth";
+import { deleteCvAction } from "@/src/app/[locale]/actions/cv";
 import { DashboardClientProps } from "@/src/types/dashboard";
 
 const CV_API = "/api/cv";

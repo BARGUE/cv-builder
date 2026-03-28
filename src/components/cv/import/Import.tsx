@@ -10,7 +10,7 @@ import DoneConfirmation from "./DoneConfirmation";
 import { myToast } from "@/src/components/ui/toast";
 import type { CVData } from "@/src/types/cv";
 import type { ImportPhase } from "@/src/components/cv/types";
-import { createCvAction } from "@/src/app/actions/cv";
+import { createCvAction } from "@/src/app/[locale]/actions/cv";
 
 const ImportCV = () => {
   const router = useRouter();

@@ -8,7 +8,7 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import { myToast } from "@/src/components/ui/toast";
-import { loginAction, registerAction } from "@/src/app/actions/auth";
+import { loginAction, registerAction } from "@/src/app/[locale]/actions/auth";
 
 const MIN_PASSWORD_LENGTH = 6;
 

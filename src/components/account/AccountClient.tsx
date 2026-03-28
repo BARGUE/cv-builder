@@ -18,8 +18,8 @@ import Link from "next/link";
 import PasswordChangeModal from "@/src/components/account/PasswordChangeModal";
 import AccountStats from "@/src/components/account/AccountStats";
 import type { AccountClientProps, ProfileFormValues } from "@/src/components/account/types";
-import { logoutAction } from "@/src/app/actions/auth";
-import { updateProfileAction } from "@/src/app/actions/profile";
+import { logoutAction } from "@/src/app/[locale]/actions/auth";
+import { updateProfileAction } from "@/src/app/[locale]/actions/profile";
 
 const defaultProfileValues: ProfileFormValues = {
   firstName: "",

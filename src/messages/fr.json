@@ -1,0 +1,678 @@
+{
+  "brand": "CVBuilder",
+  "homePage": {
+    "title": "Créez un CV en ligne en toute simplicité",
+    "description": "Créez un CV en quelques minutes grâce à nos modèles approuvés par les recruteurs. 6 templates professionnels, aperçu temps réel."
+  },
+  "common": {
+    "back": "Retour",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "continue": "Continuer",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "change": "Changer",
+    "loading": "Chargement...",
+    "sending": "Envoi en cours…",
+    "uploadInProgress": "Upload en cours...",
+    "noName": "Sans nom",
+    "yourName": "Votre Nom",
+    "yourTitle": "Votre Titre",
+    "photoAlt": "Photo",
+    "present": "Présent",
+    "defaultCvFilename": "CV",
+    "selectDatePlaceholder": "Sélectionner",
+    "selectDateTitle": "Sélectionner une date"
+  },
+  "header": {
+    "login": "Connexion",
+    "registerCta": "Commencer →"
+  },
+  "footer": {
+    "disclaimer": "*Les noms et logos des sociétés mentionnées ci-dessus sont des marques déposées appartenant à leurs détenteurs respectifs. Sauf indication contraire, ces références ne visent en aucun cas à suggérer une affiliation ou une association avec CVBuilder.",
+    "servicesTitle": "Services",
+    "createCv": "Créer un CV",
+    "createCoverLetter": "Créer une lettre de motivation",
+    "aboutTitle": "À propos",
+    "contactUs": "Nous contacter",
+    "terms": "Conditions générales de vente",
+    "privacy": "Politique de confidentialité",
+    "langFr": "FR",
+    "langEn": "EN"
+  },
+  "hero": {
+    "socialProofHighlight": "+1 000",
+    "socialProofRest": "d'utilisateurs satisfaits",
+    "titleLine1": "Créez un CV en ligne",
+    "titleLine2": "en toute simplicité",
+    "description": "Créez un CV en quelques minutes grâce à nos modèles approuvés par les recruteurs. 6 templates professionnels, aperçu temps réel.",
+    "createMyCv": "Créer mon CV",
+    "alreadyHaveAccount": "J'ai déjà un compte",
+    "stat100": "100%",
+    "stat100Label": "gratuit",
+    "stat6": "6",
+    "stat6Label": "templates",
+    "stat5min": "5 min",
+    "stat5minLabel": "pour créer",
+    "heroImageAlt": "Utilisatrice créant son CV"
+  },
+  "marquee": {
+    "items": [
+      "Classic",
+      "Modern",
+      "Creative",
+      "Compact",
+      "Executive",
+      "Sidebar",
+      "Export PDF",
+      "Photo profil",
+      "Compétences",
+      "Langues"
+    ]
+  },
+  "appMockup": {
+    "kicker": "L'éditeur",
+    "title": "Tout en un seul endroit.",
+    "urlBar": "cvbuilder.app/cv/edit"
+  },
+  "howItWorks": {
+    "title": "Créer votre CV en",
+    "titleHighlight": "4 étapes",
+    "steps": [
+      "Choisissez un modèle\napprouvé par les recruteurs.",
+      "Complétez votre CV\navec aperçu en temps réel.",
+      "Personnalisez le design\nselon vos goûts.",
+      "Téléchargez votre CV et\ncommencez à postuler."
+    ],
+    "cta": "Créer mon CV en ligne"
+  },
+  "ctaSection": {
+    "kicker": "Prêt à commencer ?",
+    "titleLine1": "Votre prochain",
+    "titleLine2": "poste vous attend.",
+    "button": "Créer mon CV gratuitement",
+    "footnote": "Aucune carte bancaire requise."
+  },
+  "floatingCard": {
+    "sampleName": "Elsa Monet",
+    "sampleJob": "Conseillère de vente",
+    "experienceSection": "Expérience professionnelle",
+    "educationSection": "Diplômes et formations",
+    "skillsLabel": "Compétences",
+    "importCv": "Importer mon CV",
+    "prewrittenContent": "Contenu pré-rédigé"
+  },
+  "contact": {
+    "heroTitle": "Nous sommes là pour",
+    "heroTitleHighlight": "vous aider",
+    "heroSubtitle": "Une question, une suggestion ou besoin d'aide ? Notre équipe vous répond sous 24h.",
+    "cards": {
+      "email": {
+        "title": "Email",
+        "value": "contact@cvbuilder.fr",
+        "hint": "Réponse sous 24h"
+      },
+      "location": {
+        "title": "Localisation",
+        "value": "Paris, France",
+        "hint": "100% en ligne"
+      },
+      "hours": {
+        "title": "Horaires",
+        "value": "Lun – Ven, 9h – 18h",
+        "hint": "Heure de Paris (CET)"
+      }
+    },
+    "formTitle": "Envoyez-nous un message",
+    "formSubtitle": "Remplissez le formulaire ci-dessous et nous reviendrons vers vous rapidement.",
+    "fields": {
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "Jean Dupont",
+      "email": "Email",
+      "emailPlaceholder": "jean@email.com",
+      "subject": "Sujet",
+      "subjectPlaceholder": "Ex: Problème de téléchargement PDF",
+      "message": "Message",
+      "messagePlaceholder": "Décrivez votre demande en détail…"
+    },
+    "submit": "Envoyer le message",
+    "supportCard": {
+      "title": "Support prioritaire",
+      "description": "Besoin d'une réponse rapide ? Notre équipe traite les demandes urgentes en priorité.",
+      "learnMore": "En savoir plus"
+    },
+    "faqTitle": "Questions fréquentes",
+    "faqHint": "Cliquez sur une question pour voir la réponse",
+    "faq": [
+      {
+        "q": "Comment exporter mon CV en PDF ?",
+        "a": "Rendez-vous dans l'éditeur de votre CV, puis cliquez sur le bouton « Télécharger PDF » en haut à droite. Le fichier sera généré instantanément avec la mise en page exacte de votre aperçu."
+      },
+      {
+        "q": "Puis-je changer de modèle après ?",
+        "a": "Absolument ! Vous pouvez changer de template à tout moment depuis l'éditeur sans perdre vos informations. Tout votre contenu sera automatiquement réadapté au nouveau design."
+      },
+      {
+        "q": "Mes données sont-elles sécurisées ?",
+        "a": "Oui, toutes vos données sont chiffrées et stockées de manière sécurisée. Nous respectons le RGPD et ne partageons jamais vos informations avec des tiers."
+      },
+      {
+        "q": "Comment supprimer mon compte ?",
+        "a": "Contactez-nous via ce formulaire avec le sujet « Suppression de compte » et nous traiterons votre demande sous 48h, conformément à vos droits RGPD."
+      }
+    ],
+    "toast": {
+      "successTitle": "Message envoyé avec succès",
+      "successDescription": "Nous reviendrons vers vous rapidement.",
+      "errorTitle": "Erreur lors de l'envoi",
+      "errorDescription": "Veuillez réessayer plus tard.",
+      "sendError": "Erreur lors de l'envoi"
+    }
+  },
+  "dashboard": {
+    "sidebarDocuments": "Documents",
+    "logout": "Déconnexion",
+    "pageTitle": "Documents",
+    "pageSubtitle": "Gérez et créez vos CV",
+    "newCv": "Nouveau CV",
+    "tabCvs": "CVs",
+    "tabCoverLetters": "Lettres de motivation",
+    "emptyTitle": "Vous n'avez pas encore de CV.",
+    "emptyDescription": "Créez votre premier CV en quelques minutes et téléchargez-le en PDF.",
+    "createFirstCv": "Créer mon premier CV",
+    "completed": "Terminé",
+    "toastDeleted": "CV supprimé",
+    "toastPdfOk": "PDF téléchargé !"
+  },
+  "account": {
+    "sidebarDocuments": "Documents",
+    "sidebarAccount": "Mon compte",
+    "logout": "Déconnexion",
+    "pageTitle": "Mon compte",
+    "pageSubtitle": "Gérez votre profil et vos préférences",
+    "avatarAlt": "Avatar",
+    "personalInfo": "Informations personnelles",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Jean",
+    "lastName": "Nom",
+    "lastNamePlaceholder": "Dupont",
+    "emailLabel": "Adresse e-mail",
+    "saveProfile": "Enregistrer les modifications",
+    "saving": "Enregistrement...",
+    "security": "Sécurité",
+    "securityDescription": "Mettez à jour votre mot de passe pour sécuriser votre compte.",
+    "statsTitle": "Statistiques",
+    "stats": {
+      "cvsCreated": "CVs créés",
+      "templatesUsed": "Templates utilisés",
+      "lastActivity": "Dernière activité",
+      "activityChartTitle": "Activité des 6 derniers mois",
+      "templateDistribution": "Répartition par template"
+    },
+    "toasts": {
+      "mustBeLoggedInPhoto": "Vous devez être connecté pour modifier votre photo.",
+      "fileMustBeImage": "Le fichier doit être une image (JPEG, PNG, GIF, etc.).",
+      "imageMaxSize": "L'image ne doit pas dépasser 2 Mo.",
+      "photoLoaded": "Photo chargée. Cliquez sur « Enregistrer » pour l'appliquer.",
+      "cannotReadImage": "Impossible de lire l'image.",
+      "readFileError": "Erreur lors de la lecture du fichier. Réessayez avec une autre image.",
+      "readAborted": "Lecture du fichier annulée.",
+      "unexpectedError": "Erreur inattendue",
+      "cannotLoadImage": "Impossible de charger l'image : {message}",
+      "unauthenticated": "Non authentifié",
+      "profileUpdated": "Profil mis à jour !",
+      "saveError": "Erreur lors de la sauvegarde."
+    }
+  },
+  "passwordModal": {
+    "trigger": "Changer le mot de passe",
+    "title": "Changer le mot de passe",
+    "description": "Entrez votre nouveau mot de passe ci-dessous.",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "toasts": {
+      "minLength": "Le mot de passe doit contenir au moins 6 caractères.",
+      "mismatch": "Les mots de passe ne correspondent pas.",
+      "success": "Mot de passe modifié avec succès !",
+      "error": "Erreur lors du changement de mot de passe.",
+      "modifying": "Modification..."
+    }
+  },
+  "auth": {
+    "back": "Retour",
+    "loginTitle": "Connexion",
+    "registerTitleLine1": "Créer un compte pour",
+    "registerTitleHighlight": "Obtenez votre CV",
+    "loginSubtitle": "Bon retour parmi nous !",
+    "registerSubtitle": "Inscrivez-vous avec votre e-mail pour enregistrer, modifier et télécharger votre CV.",
+    "firstName": "Prénom",
+    "lastName": "Nom de famille",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+    "submitLogin": "Se connecter",
+    "submitRegister": "Obtenez votre CV",
+    "submitLoading": "Chargement...",
+    "toggleLoginPrompt": "Pas encore de compte ? ",
+    "toggleRegisterPrompt": "Vous avez déjà un compte ? ",
+    "toggleToRegister": "S'inscrire",
+    "toggleToLogin": "Connexion",
+    "errors": {
+      "emailPasswordRequired": "Email et mot de passe requis",
+      "passwordMin": "Le mot de passe doit contenir au moins {min} caractères",
+      "nameRequired": "Prénom et nom requis",
+      "generic": "Une erreur est survenue"
+    },
+    "toast": {
+      "loginOk": "Connexion réussie",
+      "registerOk": "Inscription réussie"
+    }
+  },
+  "cvStart": {
+    "backToDashboard": "Retour au dashboard",
+    "title": "Comment souhaitez-vous commencer votre CV ?",
+    "fromScratchTitle": "Créer un nouveau\nCV à partir de zéro",
+    "fromScratchDescription": "Guide étape par étape pour créer un CV au top.",
+    "importBadge": "90 % plus rapide",
+    "importTitle": "Importer mon CV\nexistant",
+    "importDescription": "Profitez des conseils d'experts pour améliorer votre CV."
+  },
+  "cvImport": {
+    "back": "Retour",
+    "title": "Importer votre CV existant",
+    "subtitle": "Profitez des conseils d'experts pour améliorer votre CV.",
+    "dropTitle": "Glissez-déposez un fichier ici",
+    "formatsHint": "Format accepté : PDF, DOCX",
+    "pdfOnlyError": "PDF uniquement pour l'instant",
+    "importButton": "Importer",
+    "scanningTitle": "Nous importons votre CV...",
+    "scanningSubtitle": "Nous organisons vos informations et appliquons votre modèle.",
+    "analysisDone": "Analyse du CV terminée",
+    "analysisInProgress": "Analyse du CV en cours...",
+    "doneTitle": "L'importation est terminée !",
+    "doneSubtitle": "Commencez à revoir et améliorer votre CV.",
+    "doneImageAlt": "Import réussi",
+    "errors": {
+      "analysisFailed": "Erreur lors de l'analyse du CV.",
+      "importFailed": "Erreur lors de l'import.",
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter."
+    }
+  },
+  "cvEditor": {
+    "backToDashboard": "Retour au dashboard",
+    "progress": "Progression",
+    "stepBadge": "Étape {step}",
+    "changeTemplate": "Changer de modèle",
+    "templateModalTitle": "Changer de modèle",
+    "accentColor": "Couleur d'accent",
+    "footer": {
+      "previous": "Précédent",
+      "dashboard": "Dashboard",
+      "saved": "Sauvegardé",
+      "save": "Sauvegarder",
+      "next": "Suivant",
+      "pdf": "PDF",
+      "finish": "Terminer"
+    },
+    "toasts": {
+      "pdfOk": "PDF téléchargé !",
+      "pdfError": "Erreur lors de la génération du PDF",
+      "saved": "CV sauvegardé !",
+      "noChanges": "Aucun changement à enregistrer"
+    },
+    "steps": [
+      {
+        "label": "Coordonnées"
+      },
+      {
+        "label": "Expérience professionnelle"
+      },
+      {
+        "label": "Diplômes et formations"
+      },
+      {
+        "label": "Compétences"
+      },
+      {
+        "label": "Résumé"
+      },
+      {
+        "label": "Autres sections"
+      },
+      {
+        "label": "Finaliser"
+      }
+    ],
+    "stepTitles": {
+      "1": {
+        "title": "Commençons par vos coordonnées",
+        "subtitle": "Pour aider les employeurs à vous contacter, nous vous recommandons d'ajouter votre nom, votre email et votre numéro de téléphone."
+      },
+      "2": {
+        "title": "Expérience professionnelle",
+        "subtitle": "Ajoutez vos expériences les plus récentes et pertinentes."
+      },
+      "3": {
+        "title": "Diplômes et formations",
+        "subtitle": "Indiquez vos diplômes et formations pertinentes."
+      },
+      "4": {
+        "title": "Compétences",
+        "subtitle": "Listez vos compétences clés et évaluez votre niveau."
+      },
+      "5": {
+        "title": "Résumé professionnel",
+        "subtitle": "Rédigez un court résumé qui met en valeur votre profil."
+      },
+      "6": {
+        "title": "Autres sections",
+        "subtitle": "Ajoutez des langues ou d'autres informations complémentaires."
+      },
+      "7": {
+        "title": "Finaliser votre CV",
+        "subtitle": "Choisissez votre template et donnez un titre à votre CV."
+      }
+    },
+    "step1": {
+      "photoIdentity": "Photo & identité",
+      "addPhoto": "Ajouter une photo",
+      "contact": "Contact",
+      "fullName": "Nom complet *",
+      "fullNamePlaceholder": "ex. Jean Dupont",
+      "jobTitle": "Intitulé du poste *",
+      "jobTitlePlaceholder": "ex. Développeur Web",
+      "phone": "Téléphone *",
+      "phonePlaceholder": "ex. 06 12 34 56 78",
+      "email": "E-mail *",
+      "emailPlaceholder": "ex. jean@exemple.com",
+      "city": "Ville *",
+      "cityPlaceholder": "ex. Paris, France"
+    },
+    "step2": {
+      "experienceN": "Expérience {n}",
+      "company": "Entreprise *",
+      "companyPlaceholder": "ex. Google",
+      "position": "Poste *",
+      "positionPlaceholder": "ex. Développeur Senior",
+      "startDate": "Date de début *",
+      "startPlaceholder": "ex. Jan 2020",
+      "endDate": "Date de fin",
+      "endPlaceholder": "ex. Présent",
+      "description": "Description",
+      "descriptionPlaceholder": "Décrivez vos responsabilités...",
+      "addExperience": "Ajouter une expérience"
+    },
+    "step3": {
+      "formationN": "Formation {n}",
+      "school": "École / Université *",
+      "schoolPlaceholder": "ex. Université Paris-Saclay",
+      "degree": "Diplôme *",
+      "degreePlaceholder": "ex. Master Informatique",
+      "startDate": "Date de début *",
+      "startPlaceholder": "ex. Sep 2018",
+      "endDate": "Date de fin",
+      "endPlaceholder": "ex. Jun 2020",
+      "addFormation": "Ajouter une formation"
+    },
+    "step4": {
+      "skillPlaceholder": "ex. JavaScript",
+      "addSkill": "Ajouter une compétence"
+    },
+    "step5": {
+      "label": "Résumé professionnel *",
+      "placeholder": "Décrivez-vous en quelques phrases. Mettez en avant vos points forts et votre valeur ajoutée...",
+      "charCount": "{count} / 2000 caractères"
+    },
+    "step6": {
+      "languagePlaceholder": "ex. Anglais",
+      "addLanguage": "Ajouter une langue"
+    },
+    "step7": {
+      "cvTitle": "Titre du CV",
+      "cvTitlePlaceholder": "ex. Mon CV Développeur",
+      "template": "Template"
+    },
+    "languageLevels": [
+      "Débutant",
+      "Intermédiaire",
+      "Avancé",
+      "Courant",
+      "Natif"
+    ],
+    "defaults": {
+      "cvTitle": "Mon CV"
+    }
+  },
+  "templates": {
+    "classic": "Classique",
+    "modern": "Moderne",
+    "creative": "Créatif",
+    "compact": "Compact",
+    "executive": "Executive",
+    "sidebar": "Sidebar",
+    "minimaliste": "Minimaliste",
+    "playfair": "Créatif Playfair",
+    "tech": "Tech"
+  },
+  "accentColors": {
+    "indigo": "Indigo",
+    "blue": "Bleu",
+    "green": "Vert",
+    "red": "Rouge",
+    "orange": "Orange",
+    "violet": "Violet",
+    "pink": "Rose",
+    "gray": "Gris"
+  },
+  "preview": {
+    "profile": "Profil",
+    "experience": "Expérience",
+    "experienceFull": "Expérience professionnelle",
+    "education": "Formation",
+    "skills": "Compétences",
+    "languages": "Langues",
+    "about": "À propos"
+  },
+  "date": {
+    "monthsShort": [
+      "Jan",
+      "Fév",
+      "Mar",
+      "Avr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Aoû",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Déc"
+    ],
+    "monthsScroll": [
+      "Jan",
+      "Fév",
+      "Mar",
+      "Avr",
+      "Mai",
+      "Juin",
+      "Juil",
+      "Aoû",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Déc"
+    ]
+  },
+  "validation": {
+    "phoneRequired": "Téléphone requis",
+    "phoneMax": "Maximum 14 caractères",
+    "phoneDigitsOnly": "Uniquement des chiffres (et espaces)",
+    "phoneMinDigits": "Au moins 10 chiffres",
+    "emailRequired": "E-mail requis",
+    "emailInvalid": "E-mail invalide",
+    "fieldRequired": "Champ requis",
+    "summaryRequired": "Résumé requis",
+    "maxChars2000": "Maximum 2000 caractères"
+  },
+  "serverErrors": {
+    "unauthenticated": "Non authentifié",
+    "cvCreateError": "Erreur lors de la création",
+    "cvUpdateError": "Erreur lors de la mise à jour",
+    "cvDeleteError": "Erreur lors de la suppression",
+    "profileNotFound": "Profil introuvable",
+    "passwordMinServer": "Le mot de passe doit contenir au moins 6 caractères.",
+    "passwordChangeError": "Erreur lors du changement",
+    "authEmailPasswordRequired": "Email et mot de passe requis",
+    "authNameRequiredRegister": "Prénom et nom requis pour l'inscription",
+    "invalidCredentials": "Identifiants invalides",
+    "registrationDenied": "Inscription refusée",
+    "contact": {
+      "configMissing": "Configuration serveur manquante (AUTH_API_URL)",
+      "invalidBody": "Corps invalide",
+      "missingFields": "Champs requis manquants",
+      "sendError": "Erreur lors de l'envoi",
+      "unavailable": "Service temporairement indisponible"
+    },
+    "pdf": {
+      "cannotLoadCv": "Impossible de charger le CV",
+      "pdfGenerationError": "Erreur lors de la génération du PDF",
+      "cvLoadError": "Erreur lors du chargement du CV"
+    }
+  },
+  "legal": {
+    "privacy": {
+      "heroTitle": "Politique de",
+      "heroTitleHighlight": "confidentialité",
+      "heroSubtitle": "Dernière mise à jour : 12 mars 2026 — Vos données sont notre priorité.",
+      "trustBar": [
+        {
+          "label": "Chiffrement",
+          "desc": "AES-256 en transit et au repos"
+        },
+        {
+          "label": "Conformité RGPD",
+          "desc": "Conforme aux normes européennes"
+        },
+        {
+          "label": "Pas de revente",
+          "desc": "Vos données ne sont jamais vendues"
+        }
+      ],
+      "sections": [
+        {
+          "title": "1. Collecte des données",
+          "content": "Dans le cadre de l'utilisation de CVBuilder, nous collectons les données personnelles suivantes : nom, prénom, adresse email, numéro de téléphone, adresse postale, informations professionnelles et académiques saisies dans les CV."
+        },
+        {
+          "title": "2. Finalités du traitement",
+          "content": "Les données collectées sont utilisées pour :",
+          "list": [
+            "La création et la gestion de votre compte utilisateur",
+            "La génération et le stockage de vos CV",
+            "L'amélioration de nos services et de l'expérience utilisateur",
+            "L'envoi de communications relatives au service"
+          ]
+        },
+        {
+          "title": "3. Base légale",
+          "content": "Le traitement de vos données repose sur l'exécution du contrat (fourniture du service) et, le cas échéant, sur votre consentement pour les communications marketing."
+        },
+        {
+          "title": "4. Durée de conservation",
+          "content": "Vos données personnelles sont conservées pendant toute la durée de votre inscription et pendant une durée de 3 ans après la dernière activité sur votre compte. Au-delà, vos données seront supprimées ou anonymisées."
+        },
+        {
+          "title": "5. Partage des données",
+          "content": "Vos données ne sont pas vendues à des tiers. Elles peuvent être partagées avec nos sous-traitants techniques (hébergement, infrastructure) dans le strict cadre de la fourniture du service, et conformément au RGPD."
+        },
+        {
+          "title": "6. Sécurité",
+          "content": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données contre tout accès non autorisé, modification, divulgation ou destruction. Les données sont chiffrées en transit et au repos."
+        },
+        {
+          "title": "7. Vos droits",
+          "content": "Conformément au RGPD, vous disposez des droits suivants :",
+          "rights": [
+            {
+              "label": "Droit d'accès",
+              "desc": "Obtenir une copie de vos données personnelles"
+            },
+            {
+              "label": "Droit de rectification",
+              "desc": "Corriger vos données inexactes"
+            },
+            {
+              "label": "Droit à l'effacement",
+              "desc": "Demander la suppression de vos données"
+            },
+            {
+              "label": "Droit à la portabilité",
+              "desc": "Recevoir vos données dans un format structuré"
+            },
+            {
+              "label": "Droit d'opposition",
+              "desc": "Vous opposer au traitement de vos données"
+            }
+          ]
+        },
+        {
+          "title": "8. Cookies",
+          "content": "CVBuilder utilise des cookies strictement nécessaires au fonctionnement du service (authentification, préférences). Aucun cookie publicitaire n'est utilisé sans votre consentement explicite."
+        },
+        {
+          "title": "9. Contact",
+          "content": "Pour toute question relative à la protection de vos données, vous pouvez nous écrire à contact@cvbuilder.fr ou via notre page de contact."
+        }
+      ],
+      "ctaTitle": "Exercez vos droits",
+      "ctaDescription": "Contactez notre délégué à la protection des données pour toute demande liée à vos droits RGPD.",
+      "ctaButton": "Nous contacter"
+    },
+    "terms": {
+      "heroTitle": "Conditions générales",
+      "heroTitleHighlight": "de vente",
+      "heroSubtitle": "Dernière mise à jour : 12 mars 2026",
+      "sections": [
+        {
+          "title": "1. Objet",
+          "content": "Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre CVBuilder (ci-après « le Service ») et toute personne physique ou morale (ci-après « l'Utilisateur ») souhaitant utiliser les services proposés sur le site cvbuilder.fr."
+        },
+        {
+          "title": "2. Services proposés",
+          "content": "CVBuilder propose un service en ligne de création, édition et téléchargement de curriculum vitae. Les fonctionnalités incluent la saisie d'informations personnelles, le choix de modèles, la personnalisation graphique et l'export au format PDF."
+        },
+        {
+          "title": "3. Inscription et compte utilisateur",
+          "content": "L'accès aux services nécessite la création d'un compte. L'Utilisateur s'engage à fournir des informations exactes et à maintenir la confidentialité de ses identifiants de connexion. Toute utilisation du compte est réputée effectuée par l'Utilisateur."
+        },
+        {
+          "title": "4. Tarifs et paiement",
+          "content": "Les tarifs des services sont indiqués en euros toutes taxes comprises (TTC). Le paiement s'effectue en ligne par les moyens de paiement acceptés sur la plateforme. CVBuilder se réserve le droit de modifier ses tarifs à tout moment, les nouvelles conditions tarifaires s'appliquant aux commandes passées postérieurement à la modification."
+        },
+        {
+          "title": "5. Droit de rétractation",
+          "content": "Conformément à l'article L221-28 du Code de la consommation, le droit de rétractation ne peut être exercé pour les contrats de fourniture de contenu numérique non fourni sur un support matériel dont l'exécution a commencé avec l'accord préalable exprès du consommateur."
+        },
+        {
+          "title": "6. Propriété intellectuelle",
+          "content": "L'ensemble des éléments du site (design, textes, images, logiciels) sont protégés par le droit de la propriété intellectuelle. Les CV créés par les utilisateurs restent leur propriété. CVBuilder conserve la propriété de ses modèles et de sa technologie."
+        },
+        {
+          "title": "7. Responsabilité",
+          "content": "CVBuilder s'engage à mettre en œuvre tous les moyens nécessaires pour assurer la continuité et la qualité du service. Toutefois, CVBuilder ne saurait être tenu responsable des interruptions de service, des pertes de données ou de tout dommage indirect résultant de l'utilisation du service."
+        },
+        {
+          "title": "8. Résiliation",
+          "content": "L'Utilisateur peut résilier son compte à tout moment depuis son espace personnel. CVBuilder se réserve le droit de suspendre ou résilier un compte en cas de manquement aux présentes CGV."
+        },
+        {
+          "title": "9. Droit applicable",
+          "content": "Les présentes CGV sont soumises au droit français. Tout litige relatif à leur interprétation ou exécution relève de la compétence des tribunaux français."
+        }
+      ],
+      "ctaTitle": "Des questions sur nos conditions ?",
+      "ctaDescription": "Notre équipe est disponible pour répondre à toutes vos interrogations.",
+      "ctaButton": "Nous contacter"
+    }
+  }
+}

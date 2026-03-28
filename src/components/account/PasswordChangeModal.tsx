@@ -7,7 +7,7 @@ import {
 } from "@/src/components/ui/dialog";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { myToast } from "@/src/components/ui/toast";
-import { updatePasswordAction } from "@/src/app/actions/profile";
+import { updatePasswordAction } from "@/src/app/[locale]/actions/profile";
 import type { PasswordChangeModalProps } from "@/src/components/account/types";
 
 const PasswordChangeModal = ({ onUnauthorized }: PasswordChangeModalProps) => {
