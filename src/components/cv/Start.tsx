@@ -2,9 +2,11 @@
 
 import { PenLine, ChevronRight, FileInput, Sparkles, ArrowLeft, FileText } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 const CVStart = () => {
   const router = useRouter();
+  const t = useTranslations("cvStart");
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -21,14 +23,14 @@ const CVStart = () => {
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Retour au dashboard
+          {t("backToDashboard")}
         </button>
       </header>
 
       {/* Content */}
       <div className="flex flex-col items-center justify-center px-6 py-28">
         <h1 className="text-3xl font-black tracking-tight mb-12 text-center">
-          Comment souhaitez-vous commencer votre CV ?
+          {t("title")}
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl w-full">
@@ -43,11 +45,11 @@ const CVStart = () => {
             </div>
             {/* Text */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-base tracking-tight mb-1">
-                Créer un nouveau<br />CV à partir de zéro
+              <h3 className="font-bold text-base tracking-tight mb-1 whitespace-pre-line">
+                {t("fromScratchTitle")}
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Guide étape par étape pour créer un CV au top.
+                {t("fromScratchDescription")}
               </p>
             </div>
             {/* Chevron */}
@@ -62,7 +64,7 @@ const CVStart = () => {
             <div className="absolute -top-3 right-5">
               <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold bg-[hsl(235,40%,14%)] text-white px-3.5 py-1.5 rounded-full">
                 <Sparkles className="h-3 w-3" />
-                90 % plus rapide
+                {t("importBadge")}
               </span>
             </div>
             {/* Icon block */}
@@ -71,11 +73,11 @@ const CVStart = () => {
             </div>
             {/* Text */}
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-base tracking-tight mb-1">
-                Importer mon CV<br />existant
+              <h3 className="font-bold text-base tracking-tight mb-1 whitespace-pre-line">
+                {t("importTitle")}
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Profitez des conseils d'experts pour améliorer votre CV.
+                {t("importDescription")}
               </p>
             </div>
             {/* Chevron */}

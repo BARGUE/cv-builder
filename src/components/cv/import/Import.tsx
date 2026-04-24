@@ -8,12 +8,15 @@ import { useRouter } from "next/navigation";
 import ScanningAnimation from "./ScanningAnimation";
 import DoneConfirmation from "./DoneConfirmation";
 import { myToast } from "@/src/components/ui/toast";
+import { useTranslations } from "next-intl";
 import type { CVData } from "@/src/types/cv";
-import type { ImportPhase } from "@/src/components/cv/types";
+import type { ImportCVProps, ImportPhase } from "@/src/components/cv/types";
 import { createCvAction } from "@/src/app/[locale]/actions/cv";
+import { AuthModal } from "@/src/components/auth/AuthModal";
 
-const ImportCV = () => {
+const ImportCV = ({ isAuthenticated: initialIsAuthenticated }: ImportCVProps) => {
   const router = useRouter();
+  const t = useTranslations("cvImport");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -22,10 +25,12 @@ const ImportCV = () => {
   const [savedCvId, setSavedCvId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(initialIsAuthenticated);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleFile = (file: File) => {
     if (file.type !== "application/pdf") {
-      setError("PDF uniquement pour l'instant");
+      setError(t("pdfOnlyError"));
       return;
     }
     setError(null);
@@ -69,7 +74,7 @@ const ImportCV = () => {
         });
         if (!importRes.ok) {
           const err = await importRes.json().catch(() => ({}));
-          throw new Error((err as { error?: string }).error ?? "Erreur lors de l'analyse du CV.");
+          throw new Error((err as { error?: string }).error ?? t("errors.analysisFailed"));
         }
         const data = (await importRes.json()) as CVData;
         setImportDone(true);
@@ -77,7 +82,7 @@ const ImportCV = () => {
         const saveResult = await createCvAction(data);
         if (!saveResult.success) {
           if (saveResult.error === "Non authentifié") {
-            myToast.error("Session expirée. Veuillez vous reconnecter.");
+            myToast.error(t("errors.sessionExpired"));
             router.push("/auth/login");
             setPhase("upload");
             return;
@@ -87,7 +92,7 @@ const ImportCV = () => {
         if (saveResult.data?.id) setSavedCvId(saveResult.data.id);
         setPhase("done");
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Erreur lors de l'import.";
+        const message = err instanceof Error ? err.message : t("errors.importFailed");
         setError(message);
         myToast.error(message);
         setPhase("upload");
@@ -115,7 +120,7 @@ const ImportCV = () => {
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            Retour
+            {t("back")}
           </Button>
         )}
       </header>
@@ -126,10 +131,10 @@ const ImportCV = () => {
             {phase === "upload" && (
               <motion.div key="upload" initial={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
                 <h1 className="text-2xl font-black tracking-tight text-center mb-2">
-                  Importer votre CV existant
+                  {t("title")}
                 </h1>
                 <p className="text-sm text-muted-foreground text-center mb-8">
-                  Profitez des conseils d'experts pour améliorer votre CV.
+                  {t("subtitle")}
                 </p>
 
                 <div
@@ -152,8 +157,8 @@ const ImportCV = () => {
                     <p className="text-sm font-medium text-foreground">{selectedFile.name}</p>
                   ) : (
                     <>
-                      <p className="text-sm font-semibold text-foreground">Glissez-déposez un fichier ici</p>
-                      <p className="text-xs text-muted-foreground">Format accepté : PDF, DOCX</p>
+                      <p className="text-sm font-semibold text-foreground">{t("dropTitle")}</p>
+                      <p className="text-xs text-muted-foreground">{t("formatsHint")}</p>
                     </>
                   )}
                   <input ref={fileInputRef} type="file" accept=".pdf,.docx" className="hidden" onChange={handleFileChange} />
@@ -168,11 +173,15 @@ const ImportCV = () => {
                       disabled={importing}
                       onClick={(e) => {
                         e.stopPropagation();
+                        if (!isAuthenticated) {
+                          setShowAuthModal(true);
+                          return;
+                        }
                         handleImport();
                       }}
                       className="rounded-xl px-8"
                     >
-                      Importer
+                      {t("importButton")}
                     </Button>
                   )}
                 </div>
@@ -196,6 +205,17 @@ const ImportCV = () => {
           </AnimatePresence>
         </div>
       </div>
+
+      <AuthModal
+        open={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => {
+          setIsAuthenticated(true);
+          setShowAuthModal(false);
+          handleImport();
+        }}
+        context="import"
+      />
     </div>
   );
 };

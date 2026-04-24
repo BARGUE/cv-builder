@@ -1,6 +1,7 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import type { CVData } from "@/src/types/cv";
 import type { Step7FinaliserProps } from "@/src/components/cv/types";
 import { Input } from "@/src/components/ui/input";
@@ -9,6 +10,7 @@ import { ValidatedField, useFieldValidAtPath } from "@/src/lib/validations/valid
 
 export function Step7Finaliser({ templates }: Step7FinaliserProps) {
   const { register, watch, setValue } = useFormContext<CVData>();
+  const t = useTranslations("cvEditor");
   const template = watch("template");
   const titleValid = useFieldValidAtPath("title");
 
@@ -16,11 +18,11 @@ export function Step7Finaliser({ templates }: Step7FinaliserProps) {
     <div className="space-y-6">
       <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
         <div className="space-y-1.5">
-          <span className="text-sm font-bold tracking-tight">Titre du CV</span>
+          <span className="text-sm font-bold tracking-tight">{t("step7.cvTitle")}</span>
           <ValidatedField isValid={titleValid.isValid} error={titleValid.error}>
             <Input
               className="h-11 rounded-xl"
-              placeholder="ex. Mon CV Développeur"
+              placeholder={t("step7.cvTitlePlaceholder")}
               maxLength={200}
               {...register("title")}
             />
@@ -32,20 +34,20 @@ export function Step7Finaliser({ templates }: Step7FinaliserProps) {
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
-        <span className="text-sm font-bold tracking-tight">Template</span>
+        <span className="text-sm font-bold tracking-tight">{t("step7.template")}</span>
         <div className="grid grid-cols-3 gap-3">
-          {templates.map((t) => (
+          {templates.map((tpl) => (
             <Button
-              key={t.id}
+              key={tpl.id}
               type="button"
               variant="outline"
-              onClick={() => setValue("template", t.id)}
-              className={`rounded-xl border-2 p-4 text-center text-sm font-semibold transition-all h-auto ${template === t.id
+              onClick={() => setValue("template", tpl.id, { shouldDirty: true })}
+              className={`rounded-xl border-2 p-4 text-center text-sm font-semibold transition-all h-auto ${template === tpl.id
                   ? "border-primary bg-primary/5 text-primary"
                   : "border-border hover:border-primary/30"
                 }`}
             >
-              {t.label}
+              {tpl.label}
             </Button>
           ))}
         </div>

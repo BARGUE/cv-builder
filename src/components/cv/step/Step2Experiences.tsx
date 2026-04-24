@@ -2,6 +2,7 @@
 
 import { Plus, Trash2 } from "lucide-react";
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import type { CVData } from "@/src/types/cv";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -12,15 +13,18 @@ import { ValidatedField, useFieldValidAtPath } from "@/src/lib/validations/valid
 
 function ExperienceCard({ index, onRemove }: { index: number; onRemove: () => void }) {
   const { control, register } = useFormContext<CVData>();
+  const t = useTranslations("cvEditor");
   const companyValid = useFieldValidAtPath(`experiences.${index}.company`);
   const positionValid = useFieldValidAtPath(`experiences.${index}.position`);
   const descriptionValid = useFieldValidAtPath(`experiences.${index}.description`);
+  const startDateValid = useFieldValidAtPath(`experiences.${index}.startDate`);
+  const endDateValid = useFieldValidAtPath(`experiences.${index}.endDate`);
 
   return (
     <div className="rounded-2xl border border-border bg-card p-6 space-y-4 relative">
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold text-muted-foreground">
-          Expérience {index + 1}
+          {t("step2.experienceN", { n: index + 1 })}
         </span>
         <Button
           type="button"
@@ -34,11 +38,11 @@ function ExperienceCard({ index, onRemove }: { index: number; onRemove: () => vo
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label className="text-sm font-medium">Entreprise *</Label>
+          <Label className="text-sm font-medium">{t("step2.company")}</Label>
           <ValidatedField isValid={companyValid.isValid} error={companyValid.error}>
             <Input
               className="h-11 rounded-xl"
-              placeholder="ex. Google"
+              placeholder={t("step2.companyPlaceholder")}
               maxLength={200}
               {...register(`experiences.${index}.company`)}
             />
@@ -48,11 +52,11 @@ function ExperienceCard({ index, onRemove }: { index: number; onRemove: () => vo
           )}
         </div>
         <div className="space-y-1.5">
-          <Label className="text-sm font-medium">Poste *</Label>
+          <Label className="text-sm font-medium">{t("step2.position")}</Label>
           <ValidatedField isValid={positionValid.isValid} error={positionValid.error}>
             <Input
               className="h-11 rounded-xl"
-              placeholder="ex. Développeur Senior"
+              placeholder={t("step2.positionPlaceholder")}
               maxLength={200}
               {...register(`experiences.${index}.position`)}
             />
@@ -64,42 +68,46 @@ function ExperienceCard({ index, onRemove }: { index: number; onRemove: () => vo
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label className="text-sm font-medium">Date de début *</Label>
+          <Label className="text-sm font-medium">{t("step2.startDate")}</Label>
           <Controller
             control={control}
             name={`experiences.${index}.startDate`}
             render={({ field: f }) => (
-              <ScrollDatePicker
-                value={f.value}
-                onChange={f.onChange}
-                placeholder="ex. Jan 2020"
-                className="w-full"
-              />
+              <ValidatedField isValid={startDateValid.isValid} error={startDateValid.error} ringOnChild={true}>
+                <ScrollDatePicker
+                  value={f.value}
+                  onChange={f.onChange}
+                  placeholder={t("step2.startPlaceholder")}
+                  className="w-full"
+                />
+              </ValidatedField>
             )}
           />
         </div>
         <div className="space-y-1.5">
-          <Label className="text-sm font-medium">Date de fin</Label>
+          <Label className="text-sm font-medium">{t("step2.endDate")}</Label>
           <Controller
             control={control}
             name={`experiences.${index}.endDate`}
             render={({ field: f }) => (
-              <ScrollDatePicker
-                value={f.value}
-                onChange={f.onChange}
-                placeholder="ex. Présent"
-                className="w-full"
-              />
+              <ValidatedField isValid={endDateValid.isValid} error={endDateValid.error} ringOnChild={true}>
+                <ScrollDatePicker
+                  value={f.value}
+                  onChange={f.onChange}
+                  placeholder={t("step2.endPlaceholder")}
+                  className="w-full"
+                />
+              </ValidatedField>
             )}
           />
         </div>
       </div>
       <div className="space-y-1.5">
-        <Label className="text-sm font-medium">Description</Label>
+        <Label className="text-sm font-medium">{t("step2.description")}</Label>
         <ValidatedField isValid={descriptionValid.isValid} error={descriptionValid.error} variant="textarea">
           <Textarea
             className="rounded-xl resize-none"
-            placeholder="Décrivez vos responsabilités..."
+            placeholder={t("step2.descriptionPlaceholder")}
             rows={3}
             maxLength={2000}
             {...register(`experiences.${index}.description`)}
@@ -115,6 +123,7 @@ function ExperienceCard({ index, onRemove }: { index: number; onRemove: () => vo
 
 export function Step2Experiences() {
   const { control } = useFormContext<CVData>();
+  const t = useTranslations("cvEditor");
   const { fields, append, remove } = useFieldArray({
     control,
     name: "experiences",
@@ -142,7 +151,7 @@ export function Step2Experiences() {
         className="w-full h-12 rounded-xl border-dashed gap-2 hover:border-primary hover:bg-primary/10 hover:text-primary"
       >
         <Plus className="h-4 w-4" />
-        Ajouter une expérience
+        {t("step2.addExperience")}
       </Button>
     </div>
   );

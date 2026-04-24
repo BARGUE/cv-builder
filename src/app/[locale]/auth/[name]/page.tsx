@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -18,6 +19,7 @@ export default function AuthPage() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
+  const t = useTranslations("auth");
   const name = (params?.name as string) ?? "";
   const isLogin = name === "login";
   const errorFromUrl = searchParams.get("error");
@@ -51,12 +53,12 @@ export default function AuthPage() {
     const password = (form.password as HTMLInputElement).value;
 
     if (!email || !password) {
-      showError("Email et mot de passe requis");
+      showError(t("errors.emailPasswordRequired"));
       return;
     }
 
     if (password.length < MIN_PASSWORD_LENGTH) {
-      showError(`Le mot de passe doit contenir au moins ${MIN_PASSWORD_LENGTH} caractères`);
+      showError(t("errors.passwordMin", { min: MIN_PASSWORD_LENGTH }));
       return;
     }
 
@@ -66,7 +68,7 @@ export default function AuthPage() {
       firstName = (form.firstName as HTMLInputElement).value.trim();
       lastName = (form.lastName as HTMLInputElement).value.trim();
       if (!firstName || !lastName) {
-        showError("Prénom et nom requis");
+        showError(t("errors.nameRequired"));
         return;
       }
     }
@@ -80,11 +82,11 @@ export default function AuthPage() {
         showError(result.error);
         return;
       }
-      myToast.success(isLogin ? "Connexion réussie" : "Inscription réussie");
+      myToast.success(isLogin ? t("toast.loginOk") : t("toast.registerOk"));
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Une erreur est survenue";
+      const message = err instanceof Error ? err.message : t("errors.generic");
       showError(message);
     } finally {
       setLoading(false);
@@ -100,25 +102,23 @@ export default function AuthPage() {
       <div className="w-full max-w-md animate-fade-in">
         <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
           <ArrowLeft className="h-4 w-4" />
-          Retour
+          {t("back")}
         </Link>
 
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground leading-tight">
             {isLogin ? (
-              "Connexion"
+              t("loginTitle")
             ) : (
               <>
-                Créer un compte pour<br />
-                <span className="text-primary">Obtenez votre CV</span>
+                {t("registerTitleLine1")}<br />
+                <span className="text-primary">{t("registerTitleHighlight")}</span>
               </>
             )}
           </h1>
           <p className="text-muted-foreground text-sm mt-3 max-w-sm">
-            {isLogin
-              ? "Bon retour parmi nous !"
-              : "Inscrivez-vous avec votre e-mail pour enregistrer, modifier et télécharger votre CV."}
+            {isLogin ? t("loginSubtitle") : t("registerSubtitle")}
           </p>
         </div>
 
@@ -127,7 +127,7 @@ export default function AuthPage() {
           {!isLogin && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName" className="text-sm font-medium text-foreground">Prénom</Label>
+                <Label htmlFor="firstName" className="text-sm font-medium text-foreground">{t("firstName")}</Label>
                 <Input
                   id="firstName"
                   name="firstName"
@@ -137,7 +137,7 @@ export default function AuthPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastName" className="text-sm font-medium text-foreground">Nom de famille</Label>
+                <Label htmlFor="lastName" className="text-sm font-medium text-foreground">{t("lastName")}</Label>
                 <Input
                   id="lastName"
                   name="lastName"
@@ -150,7 +150,7 @@ export default function AuthPage() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium text-foreground">Adresse e-mail</Label>
+            <Label htmlFor="email" className="text-sm font-medium text-foreground">{t("email")}</Label>
             <Input
               id="email"
               name="email"
@@ -161,12 +161,12 @@ export default function AuthPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium text-foreground">Mot de passe</Label>
+            <Label htmlFor="password" className="text-sm font-medium text-foreground">{t("password")}</Label>
             <Input
               id="password"
               name="password"
               type="password"
-              placeholder="••••••••"
+              placeholder={t("passwordPlaceholder")}
               required
               minLength={MIN_PASSWORD_LENGTH}
               className="h-11 border-border"
@@ -178,18 +178,18 @@ export default function AuthPage() {
             className="w-full h-12 rounded-xl text-base font-semibold"
             disabled={loading}
           >
-            {loading ? "Chargement..." : isLogin ? "Se connecter" : "Obtenez votre CV"}
+            {loading ? t("submitLoading") : isLogin ? t("submitLogin") : t("submitRegister")}
           </Button>
         </form>
 
         {/* Toggle */}
         <p className="text-center text-sm text-muted-foreground mt-6">
-          {isLogin ? "Pas encore de compte ? " : "Vous avez déjà un compte ? "}
+          {isLogin ? t("toggleLoginPrompt") : t("toggleRegisterPrompt")}
           <Link
             href={isLogin ? "/auth/register" : "/auth/login"}
             className="text-primary font-medium hover:underline"
           >
-            {isLogin ? "S'inscrire" : "Connexion"}
+            {isLogin ? t("toggleToRegister") : t("toggleToLogin")}
           </Link>
         </p>
       </div>

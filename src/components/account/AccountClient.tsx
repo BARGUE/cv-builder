@@ -7,17 +7,19 @@ import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
 import { Avatar, AvatarImage, AvatarFallback } from "@/src/components/ui/avatar";
 import {
-  FileText, LogOut, User, PanelLeftClose, PanelLeftOpen,
-  Camera, Save, Settings,
+  PanelLeftClose, PanelLeftOpen,
+  Camera, Save,
   Shield,
   Mail,
+  User,
 } from "lucide-react";
+import { Sidebar } from "@/src/components/layout/Sidebar";
 import { useRouter } from "next/navigation";
 import { myToast } from "@/src/components/ui/toast";
-import Link from "next/link";
 import PasswordChangeModal from "@/src/components/account/PasswordChangeModal";
 import AccountStats from "@/src/components/account/AccountStats";
 import type { AccountClientProps, ProfileFormValues } from "@/src/components/account/types";
+import { useTranslations } from "next-intl";
 import { logoutAction } from "@/src/app/[locale]/actions/auth";
 import { updateProfileAction } from "@/src/app/[locale]/actions/profile";
 
@@ -29,6 +31,8 @@ const defaultProfileValues: ProfileFormValues = {
 
 const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
   const router = useRouter();
+  const t = useTranslations("account");
+  const tCommon = useTranslations("common");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -78,12 +82,12 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
       return;
     }
     if (!user) {
-      myToast.error("Vous devez être connecté pour modifier votre photo.");
+      myToast.error(t("toasts.mustBeLoggedInPhoto"));
       e.target.value = "";
       return;
     }
     if (!file.type.startsWith("image/")) {
-      myToast.error("Le fichier doit être une image (JPEG, PNG, GIF, etc.).");
+      myToast.error(t("toasts.fileMustBeImage"));
       e.target.value = "";
       return;
     }
@@ -92,22 +96,22 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
       const result = reader.result;
       if (result && typeof result === "string") {
         setValue("avatarUrl", result, { shouldDirty: true });
-        myToast.success("Photo chargée. Cliquez sur « Enregistrer » pour l'appliquer.");
+        myToast.success(t("toasts.photoLoaded"));
       } else {
-        myToast.error("Impossible de lire l'image.");
+        myToast.error(t("toasts.cannotReadImage"));
       }
     };
     reader.onerror = () => {
-      myToast.error("Erreur lors de la lecture du fichier. Réessayez avec une autre image.");
+      myToast.error(t("toasts.readFileError"));
     };
     reader.onabort = () => {
-      myToast.error("Lecture du fichier annulée.");
+      myToast.error(t("toasts.readAborted"));
     };
     try {
       reader.readAsDataURL(file);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Erreur inattendue";
-      myToast.error(`Impossible de charger l'image : ${msg}`);
+      const msg = err instanceof Error ? err.message : t("toasts.unexpectedError");
+      myToast.error(t("toasts.cannotLoadImage", { message: msg }));
     }
     e.target.value = "";
   };
@@ -130,12 +134,12 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
         myToast.error(result.error);
         return;
       }
-      myToast.success("Profil mis à jour !");
+      myToast.success(t("toasts.profileUpdated"));
       initialValuesRef.current = { firstName, lastName, avatarUrl };
       reset({ firstName, lastName, avatarUrl });
       router.refresh();
     } catch {
-      myToast.error("Erreur lors de la sauvegarde.");
+      myToast.error(t("toasts.saveError"));
     } finally {
       setSaving(false);
     }
@@ -143,62 +147,12 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar — same as Dashboard */}
-      <aside
-        className={`${sidebarOpen ? "w-56" : "w-16"} bg-[hsl(235,40%,14%)] flex flex-col fixed inset-y-0 left-0 z-20 transition-all duration-300`}
-      >
-        <div className={`px-4 py-6 ${!sidebarOpen && "px-3"}`}>
-          <Link href="/dashboard" className="flex items-center gap-2.5 text-white">
-            <div className="h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-              <FileText className="h-4 w-4" />
-            </div>
-            {sidebarOpen && (
-              <span className="font-black text-sm tracking-tight">CVBuilder</span>
-            )}
-          </Link>
-        </div>
-
-        <nav className="flex-1 px-3 space-y-1">
-          <Link
-            href="/dashboard"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-white/50 hover:text-white hover:bg-white/5 transition-colors ${!sidebarOpen ? 'justify-center px-0' : ''}`}
-          >
-            <FileText className="h-4 w-4 shrink-0" />
-            {sidebarOpen && "Documents"}
-          </Link>
-          <Link
-            href="/account"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold bg-white/10 text-white ${!sidebarOpen ? 'justify-center px-0' : ''}`}
-          >
-            <Settings className="h-4 w-4 shrink-0" />
-            {sidebarOpen && "Mon compte"}
-          </Link>
-        </nav>
-
-        <div className="px-3 pb-5 space-y-1.5">
-          <Button
-            variant="ghost"
-            onClick={() => handleLogout()}
-            className={`flex items-center justify-start gap-2.5 px-3 py-2.5 rounded-xl bg-transparent cursor-pointer text-sm text-white/50 hover:text-white hover:bg-white/5 transition-colors w-full ${!sidebarOpen ? "justify-center px-0" : ""}`}
-          >
-            <LogOut className="h-4 w-4 shrink-0" />
-            {sidebarOpen && "Déconnexion"}
-          </Button>
-          <Link
-            href="/account"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors ${!sidebarOpen ? "justify-center px-0" : ""}`}
-          >
-            <div className="h-7 w-7 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-              <User className="h-3.5 w-3.5 text-white/60" />
-            </div>
-            {sidebarOpen && (
-              <span className="text-xs text-white/40 truncate">
-                {user?.email ?? ""}
-              </span>
-            )}
-          </Link>
-        </div>
-      </aside>
+      <Sidebar
+        sidebarOpen={sidebarOpen}
+        activeRoute="account"
+        user={user}
+        onLogout={handleLogout}
+      />
 
       {/* Main */}
       <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-56' : 'ml-16'}`}>
@@ -214,8 +168,8 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
               {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
             </Button>
             <div>
-              <h1 className="text-3xl font-black tracking-tight">Mon compte</h1>
-              <p className="text-sm text-muted-foreground mt-0.5">Gérez votre profil et vos préférences</p>
+              <h1 className="text-3xl font-black tracking-tight">{t("pageTitle")}</h1>
+              <p className="text-sm text-muted-foreground mt-0.5">{t("pageSubtitle")}</p>
             </div>
           </div>
         </header>
@@ -231,7 +185,7 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
               <div className="flex items-center gap-6">
                 <div className="relative group">
                   <Avatar className="h-20 w-20 border-2 border-border">
-                    {currentValues.avatarUrl ? <AvatarImage src={currentValues.avatarUrl} alt="Avatar" /> : null}
+                    {currentValues.avatarUrl ? <AvatarImage src={currentValues.avatarUrl} alt={t("avatarAlt")} /> : null}
                     <AvatarFallback className="text-lg font-black bg-primary/10 text-primary">
                       {initials}
                     </AvatarFallback>
@@ -249,12 +203,12 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-foreground text-lg tracking-tight">{currentValues.firstName && currentValues.lastName ? `${currentValues.firstName} ${currentValues.lastName}` : "Sans nom"}</p>
+                  <p className="font-bold text-foreground text-lg tracking-tight">{currentValues.firstName && currentValues.lastName ? `${currentValues.firstName} ${currentValues.lastName}` : tCommon("noName")}</p>
                   <div className="flex items-center gap-1.5 mt-1">
                     <Mail className="h-3.5 w-3.5 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
                   </div>
-                  {saving && <p className="text-xs text-primary mt-2">Upload en cours...</p>}
+                  {saving && <p className="text-xs text-primary mt-2">{tCommon("uploadInProgress")}</p>}
                 </div>
               </div>
             </div>
@@ -263,14 +217,14 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
             <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
               <h2 className="text-base font-black tracking-tight flex items-center gap-2">
                 <User className="h-4 w-4 text-primary" />
-                Informations personnelles
+                {t("personalInfo")}
               </h2>
               <div className="flex flex-row gap-2">
                 <div className="w-1/2">
-                  <Label htmlFor="firstName">Prénom</Label>
+                  <Label htmlFor="firstName">{t("firstName")}</Label>
                   <Input
                     id="firstName"
-                    placeholder="Jean"
+                    placeholder={t("firstNamePlaceholder")}
                     maxLength={100}
                     className="h-11 rounded-xl"
                     {...register("firstName")}
@@ -278,27 +232,19 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
                 </div>
 
                 <div className="w-1/2">
-                  <Label htmlFor="lastName">Nom</Label>
+                  <Label htmlFor="lastName">{t("lastName")}</Label>
                   <Input
                     id="lastName"
-                    placeholder="Dupont"
+                    placeholder={t("lastNamePlaceholder")}
                     maxLength={100}
                     className="h-11 rounded-xl"
                     {...register("lastName")}
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label>Adresse e-mail</Label>
-                <Input
-                  value={user?.email || ""}
-                  disabled
-                  className="h-11 rounded-xl bg-muted/50"
-                />
-              </div>
               <Button type="button" size="lg" className="h-11 px-6 rounded-xl text-sm font-semibold gap-2" onClick={handleSaveProfile} disabled={disabledSaveProfile}>
                 <Save className="h-4 w-4" />
-                {saving ? "Enregistrement..." : "Enregistrer les modifications"}
+                {saving ? t("saving") : t("saveProfile")}
               </Button>
             </div>
 
@@ -306,10 +252,10 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
             <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
               <h2 className="text-base font-black tracking-tight flex items-center gap-2">
                 <Shield className="h-4 w-4 text-primary" />
-                Sécurité
+                {t("security")}
               </h2>
               <p className="text-sm text-muted-foreground">
-                Mettez à jour votre mot de passe pour sécuriser votre compte.
+                {t("securityDescription")}
               </p>
               <PasswordChangeModal onUnauthorized={handleUnauthorized} />
             </div>
@@ -317,7 +263,7 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
 
           {/* Right: Stats */}
           <div className="lg:col-span-2">
-            <h2 className="text-base font-black tracking-tight mb-5">Statistiques</h2>
+            <h2 className="text-base font-black tracking-tight mb-5">{t("statsTitle")}</h2>
             {user?.id && <AccountStats cvs={initialCvs} />}
           </div>
         </div>

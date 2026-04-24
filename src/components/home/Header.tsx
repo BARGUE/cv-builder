@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { Button } from "@/src/components/ui/button";
 import { FileText } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function Header() {
+  const t = useTranslations("header");
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[hsl(235,40%,14%)]/90 backdrop-blur-sm border-b border-white/5">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -14,10 +17,10 @@ export function Header() {
         </Link>
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" className="text-white/60 hover:text-white hover:bg-white/10 text-sm" asChild>
-            <Link href="/auth/login">Connexion</Link>
+            <Link href="/auth/login">{t("login")}</Link>
           </Button>
           <Button size="sm" className="rounded-xl px-5 text-sm" asChild>
-            <Link href="/auth/register">Commencer →</Link>
+            <Link href="/auth/register">{t("registerCta")}</Link>
           </Button>
         </div>
       </div>

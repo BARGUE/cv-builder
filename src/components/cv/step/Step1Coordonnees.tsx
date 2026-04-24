@@ -2,6 +2,7 @@
 
 import { User, Briefcase, Upload, Trash2 } from "lucide-react";
 import { useFormContext } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import type { CVData } from "@/src/types/cv";
 import type { Step1CoordonneesProps } from "@/src/components/cv/types";
 import { getFieldInputProps } from "@/src/lib/validations/cv";
@@ -12,6 +13,8 @@ import { ValidatedField, useFieldValidAtPath } from "@/src/lib/validations/valid
 
 export function Step1Coordonnees({ handlePhotoUpload, fileInputRef }: Step1CoordonneesProps) {
   const { register, watch, setValue } = useFormContext<CVData>();
+  const t = useTranslations("cvEditor");
+  const tCommon = useTranslations("common");
   const photoUrl = watch("photoUrl");
 
   const phoneReg = register("phone");
@@ -30,12 +33,12 @@ export function Step1Coordonnees({ handlePhotoUpload, fileInputRef }: Step1Coord
           <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
             <User className="h-4 w-4 text-primary" />
           </div>
-          <span className="text-sm font-bold tracking-tight">Photo & identité</span>
+          <span className="text-sm font-bold tracking-tight">{t("step1.photoIdentity")}</span>
         </div>
         <div className="flex items-center gap-5">
           <div className="h-16 w-16 rounded-2xl bg-muted flex items-center justify-center overflow-hidden border border-border shrink-0">
             {photoUrl ? (
-              <img src={photoUrl} alt="Photo" className="h-full w-full object-cover" />
+              <img src={photoUrl} alt={tCommon("photoAlt")} className="h-full w-full object-cover" />
             ) : (
               <User className="h-6 w-6 text-muted-foreground" />
             )}
@@ -56,7 +59,7 @@ export function Step1Coordonnees({ handlePhotoUpload, fileInputRef }: Step1Coord
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="h-3.5 w-3.5 mr-1.5" />
-              {photoUrl ? "Changer" : "Ajouter une photo"}
+              {photoUrl ? tCommon("change") : t("step1.addPhoto")}
             </Button>
             {photoUrl && (
               <Button
@@ -67,18 +70,18 @@ export function Step1Coordonnees({ handlePhotoUpload, fileInputRef }: Step1Coord
                 onClick={() => setValue("photoUrl", "")}
               >
                 <Trash2 className="h-3.5 w-3.5 mr-1.5" />
-                Supprimer
+                {tCommon("delete")}
               </Button>
             )}
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium">Nom complet *</Label>
+            <Label className="text-sm font-medium">{t("step1.fullName")}</Label>
             <ValidatedField isValid={fullNameValid.isValid} error={fullNameValid.error}>
               <Input
                 className="h-11 rounded-xl"
-                placeholder="ex. Jean Dupont"
+                placeholder={t("step1.fullNamePlaceholder")}
                 {...register("fullName")}
               />
             </ValidatedField>
@@ -87,11 +90,11 @@ export function Step1Coordonnees({ handlePhotoUpload, fileInputRef }: Step1Coord
             )}
           </div>
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium">Intitulé du poste *</Label>
+            <Label className="text-sm font-medium">{t("step1.jobTitle")}</Label>
             <ValidatedField isValid={jobTitleValid.isValid} error={jobTitleValid.error}>
               <Input
                 className="h-11 rounded-xl"
-                placeholder="ex. Développeur Web"
+                placeholder={t("step1.jobTitlePlaceholder")}
                 {...register("jobTitle")}
               />
             </ValidatedField>
@@ -107,15 +110,15 @@ export function Step1Coordonnees({ handlePhotoUpload, fileInputRef }: Step1Coord
           <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
             <Briefcase className="h-4 w-4 text-primary" />
           </div>
-          <span className="text-sm font-bold tracking-tight">Contact</span>
+          <span className="text-sm font-bold tracking-tight">{t("step1.contact")}</span>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium">Téléphone *</Label>
+            <Label className="text-sm font-medium">{t("step1.phone")}</Label>
             <ValidatedField isValid={phoneValid.isValid} error={phoneValid.error}>
               <Input
                 className="h-11 rounded-xl"
-                placeholder="ex. 06 12 34 56 78"
+                placeholder={t("step1.phonePlaceholder")}
                 {...phoneReg}
                 {...phoneInputProps}
               />
@@ -125,11 +128,11 @@ export function Step1Coordonnees({ handlePhotoUpload, fileInputRef }: Step1Coord
             )}
           </div>
           <div className="space-y-1.5">
-            <Label className="text-sm font-medium">E-mail *</Label>
+            <Label className="text-sm font-medium">{t("step1.email")}</Label>
             <ValidatedField isValid={emailValid.isValid} error={emailValid.error}>
               <Input
                 className="h-11 rounded-xl"
-                placeholder="ex. jean@exemple.com"
+                placeholder={t("step1.emailPlaceholder")}
                 {...getFieldInputProps("email")}
                 {...register("email")}
               />
@@ -140,11 +143,11 @@ export function Step1Coordonnees({ handlePhotoUpload, fileInputRef }: Step1Coord
           </div>
         </div>
         <div className="space-y-1.5">
-          <Label className="text-sm font-medium">Ville *</Label>
+          <Label className="text-sm font-medium">{t("step1.city")}</Label>
           <ValidatedField isValid={locationValid.isValid} error={locationValid.error}>
             <Input
               className="h-11 rounded-xl"
-              placeholder="ex. Paris, France"
+              placeholder={t("step1.cityPlaceholder")}
               {...register("location")}
             />
           </ValidatedField>

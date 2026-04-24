@@ -2,15 +2,16 @@
 
 import { Plus, Trash2 } from "lucide-react";
 import { useFormContext, useFieldArray } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import type { CVData } from "@/src/types/cv";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { ValidatedField, useFieldValidAtPath } from "@/src/lib/validations/validated-field";
 
-const LANGUAGE_LEVELS = ["Débutant", "Intermédiaire", "Avancé", "Courant", "Natif"] as const;
-
 function LanguageRow({ index, onRemove }: { index: number; onRemove: () => void }) {
   const { register } = useFormContext<CVData>();
+  const t = useTranslations("cvEditor");
+  const levels = t.raw("languageLevels") as string[];
   const nameValid = useFieldValidAtPath(`languages.${index}.name`);
 
   return (
@@ -19,7 +20,7 @@ function LanguageRow({ index, onRemove }: { index: number; onRemove: () => void 
         <ValidatedField isValid={nameValid.isValid} error={nameValid.error}>
           <Input
             className="h-11 rounded-xl"
-            placeholder="ex. Anglais"
+            placeholder={t("step6.languagePlaceholder")}
             maxLength={100}
             {...register(`languages.${index}.name`)}
           />
@@ -29,16 +30,16 @@ function LanguageRow({ index, onRemove }: { index: number; onRemove: () => void 
         )}
       </div>
       <div className="space-y-1.5 min-w-[140px]">
-          <select
-            className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm"
-            {...register(`languages.${index}.level`)}
-          >
-            {LANGUAGE_LEVELS.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
+        <select
+          className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm"
+          {...register(`languages.${index}.level`)}
+        >
+          {levels.map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
       </div>
       <Button
         type="button"
@@ -55,6 +56,8 @@ function LanguageRow({ index, onRemove }: { index: number; onRemove: () => void 
 
 export function Step6Langues() {
   const { control } = useFormContext<CVData>();
+  const t = useTranslations("cvEditor");
+  const levels = t.raw("languageLevels") as string[];
   const { fields, append, remove } = useFieldArray({
     control,
     name: "languages",
@@ -73,13 +76,13 @@ export function Step6Langues() {
           append({
             id: crypto.randomUUID(),
             name: "",
-            level: "Intermédiaire",
+            level: levels[1] ?? "",
           })
         }
         className="w-full h-12 rounded-xl border-dashed gap-2 hover:border-primary hover:bg-primary/10 hover:text-primary"
       >
         <Plus className="h-4 w-4" />
-        Ajouter une langue
+        {t("step6.addLanguage")}
       </Button>
     </div>
   );

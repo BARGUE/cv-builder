@@ -4,16 +4,19 @@ import { motion } from "framer-motion";
 import { InView } from "./InView";
 import { fadeUp } from "@/src/lib/animations";
 import { FileText } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function AppMockup() {
-    return (
+  const t = useTranslations("appMockup");
+
+  return (
       <section className="max-w-7xl mx-auto px-6 py-24">
         <InView>
           <motion.div variants={fadeUp} className="text-center mb-4">
-            <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground">L'éditeur</span>
+            <span className="text-xs font-medium tracking-widest uppercase text-muted-foreground">{t("kicker")}</span>
           </motion.div>
           <motion.h2 variants={fadeUp} className="text-4xl md:text-5xl font-black tracking-tighter text-center mb-16">
-            Tout en un seul endroit.
+            {t("title")}
           </motion.h2>
   
           <motion.div variants={fadeUp} className="rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
@@ -25,7 +28,7 @@ export function AppMockup() {
               </div>
               <div className="flex-1 flex justify-center">
                 <div className="bg-background rounded-md px-6 py-1 text-xs text-muted-foreground border border-border font-mono">
-                  cvbuilder.app/cv/edit
+                  {t("urlBar")}
                 </div>
               </div>
             </div>

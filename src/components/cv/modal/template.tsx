@@ -18,7 +18,7 @@ const TemplateModal = ({ showTemplateModal, setShowTemplateModal, cvData, setVal
                                 key={t.id}
                                 type="button"
                                 variant="outline"
-                                onClick={() => { setValue("template", t.id); setShowTemplateModal(false); }}
+                                onClick={() => { setValue("template", t.id, { shouldDirty: true }); setShowTemplateModal(false); }}
                                 className={`flex flex-col items-center gap-2 rounded-2xl border-2 p-2 transition-all h-auto ${cvData.template === t.id
                                     ? 'border-primary ring-2 ring-primary/20'
                                     : 'border-border hover:border-primary/40'
@@ -46,7 +46,7 @@ const TemplateModal = ({ showTemplateModal, setShowTemplateModal, cvData, setVal
                                 variant="ghost"
                                 size="icon"
                                 title={c.label}
-                                onClick={() => setValue("accentColor", c.value)}
+                                onClick={() => setValue("accentColor", c.value, { shouldDirty: true })}
                                 className="h-8 w-8 rounded-full border-2 transition-all hover:scale-110 p-0"
                                 style={{
                                     backgroundColor: c.value,
@@ -57,7 +57,7 @@ const TemplateModal = ({ showTemplateModal, setShowTemplateModal, cvData, setVal
                             />
                         ))}
                         <div className="relative h-8 w-8">
-                            <input type="color" value={cvData.accentColor} onChange={(e) => setValue("accentColor", e.target.value)} className="absolute inset-0 opacity-0 w-full h-full cursor-pointer" />
+                            <input type="color" value={cvData.accentColor} onChange={(e) => setValue("accentColor", e.target.value, { shouldDirty: true })} className="absolute inset-0 opacity-0 w-full h-full cursor-pointer" />
                             <div className="h-8 w-8 rounded-full border-2 border-dashed border-muted-foreground flex items-center justify-center text-muted-foreground text-xs font-bold hover:border-foreground transition-colors"
                                 style={{ backgroundColor: ACCENT_COLORS.some(c => c.value === cvData.accentColor) ? 'transparent' : cvData.accentColor }}>
                                 {ACCENT_COLORS.some(c => c.value === cvData.accentColor) ? '+' : ''}

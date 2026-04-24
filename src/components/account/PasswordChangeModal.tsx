@@ -1,4 +1,7 @@
+"use client";
+
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -11,6 +14,8 @@ import { updatePasswordAction } from "@/src/app/[locale]/actions/profile";
 import type { PasswordChangeModalProps } from "@/src/components/account/types";
 
 const PasswordChangeModal = ({ onUnauthorized }: PasswordChangeModalProps) => {
+  const t = useTranslations("passwordModal");
+  const tCommon = useTranslations("common");
   const [open, setOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -19,11 +24,11 @@ const PasswordChangeModal = ({ onUnauthorized }: PasswordChangeModalProps) => {
 
   const handleSubmit = async () => {
     if (newPassword.length < 6) {
-      myToast.error("Le mot de passe doit contenir au moins 6 caractères.");
+      myToast.error(t("toasts.minLength"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      myToast.error("Les mots de passe ne correspondent pas.");
+      myToast.error(t("toasts.mismatch"));
       return;
     }
 
@@ -38,12 +43,12 @@ const PasswordChangeModal = ({ onUnauthorized }: PasswordChangeModalProps) => {
         myToast.error(result.error);
         return;
       }
-      myToast.success("Mot de passe modifié avec succès !");
+      myToast.success(t("toasts.success"));
       setNewPassword("");
       setConfirmPassword("");
       setOpen(false);
     } catch {
-      myToast.error("Erreur lors du changement de mot de passe.");
+      myToast.error(t("toasts.error"));
     } finally {
       setLoading(false);
     }
@@ -54,17 +59,17 @@ const PasswordChangeModal = ({ onUnauthorized }: PasswordChangeModalProps) => {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Lock className="h-4 w-4 mr-1.5" />
-          Changer le mot de passe
+          {t("trigger")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Changer le mot de passe</DialogTitle>
-          <DialogDescription>Entrez votre nouveau mot de passe ci-dessous.</DialogDescription>
+          <DialogTitle>{t("title")}</DialogTitle>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div className="space-y-2">
-            <Label htmlFor="modal-new-pw">Nouveau mot de passe</Label>
+            <Label htmlFor="modal-new-pw">{t("newPassword")}</Label>
             <div className="relative">
               <Input
                 id="modal-new-pw"
@@ -86,7 +91,7 @@ const PasswordChangeModal = ({ onUnauthorized }: PasswordChangeModalProps) => {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="modal-confirm-pw">Confirmer le mot de passe</Label>
+            <Label htmlFor="modal-confirm-pw">{t("confirmPassword")}</Label>
             <Input
               id="modal-confirm-pw"
               type={showPassword ? "text" : "password"}
@@ -98,9 +103,9 @@ const PasswordChangeModal = ({ onUnauthorized }: PasswordChangeModalProps) => {
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)}>Annuler</Button>
+          <Button variant="ghost" onClick={() => setOpen(false)}>{tCommon("cancel")}</Button>
           <Button onClick={handleSubmit} disabled={loading || !newPassword}>
-            {loading ? "Modification..." : "Confirmer"}
+            {loading ? t("toasts.modifying") : tCommon("confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

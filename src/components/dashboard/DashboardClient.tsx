@@ -2,25 +2,23 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Button } from "@/src/components/ui/button";
 import {
   Plus,
-  FileText,
-  LogOut,
   Trash2,
   Clock,
-  User,
   PanelLeftClose,
   PanelLeftOpen,
   CheckCircle,
   Download,
   ArrowRight,
 } from "lucide-react";
+import { Sidebar } from "@/src/components/layout/Sidebar";
 import CVPreview from "@/src/components/cv/Preview";
 import { CVListItem, CVData } from "@/src/types/cv";
 import { dashboardDownloadPdf } from "@/src/lib/pdf";
 import { myToast } from "@/src/components/ui/toast";
+import { useTranslations } from "next-intl";
 import { logoutAction } from "@/src/app/[locale]/actions/auth";
 import { deleteCvAction } from "@/src/app/[locale]/actions/cv";
 import { DashboardClientProps } from "@/src/types/dashboard";
@@ -29,6 +27,8 @@ const CV_API = "/api/cv";
 
 export function DashboardClient({ user, initialCvs }: DashboardClientProps) {
   const router = useRouter();
+  const t = useTranslations("dashboard");
+  const tCommon = useTranslations("common");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [cvToDownload, setCvToDownload] = useState<CVData | null>(null);
   const [downloadingCvId, setDownloadingCvId] = useState<string | null>(null);
@@ -44,7 +44,7 @@ export function DashboardClient({ user, initialCvs }: DashboardClientProps) {
       myToast.error(result.error);
       return;
     }
-    myToast.success("CV supprimé");
+    myToast.success(t("toastDeleted"));
     router.refresh();
   };
 
@@ -56,7 +56,7 @@ export function DashboardClient({ user, initialCvs }: DashboardClientProps) {
       isDownloading: downloadingCvId !== null,
       onStart: () => setDownloadingCvId(cv.id),
       onCvLoaded: setCvToDownload,
-      onSuccess: () => myToast.success("PDF téléchargé !"),
+      onSuccess: () => myToast.success(t("toastPdfOk")),
       onError: (msg: string) => myToast.error(msg),
       onFinish: () => {
         setCvToDownload(null);
@@ -68,56 +68,12 @@ export function DashboardClient({ user, initialCvs }: DashboardClientProps) {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside
-        className={`${sidebarOpen ? "w-56" : "w-16"} bg-[hsl(235,40%,14%)] flex flex-col fixed inset-y-0 left-0 z-20 transition-all duration-300`}
-      >
-        <div className={`px-4 py-6 ${!sidebarOpen && "px-3"}`}>
-          <Link href="/dashboard" className="flex items-center gap-2.5 text-white">
-            <div className="h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-              <FileText className="h-4 w-4" />
-            </div>
-            {sidebarOpen && (
-              <span className="font-black text-sm tracking-tight">CVBuilder</span>
-            )}
-          </Link>
-        </div>
-
-        <nav className="flex-1 px-3 space-y-1">
-          <Link
-            href="/dashboard"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-semibold bg-white/10 text-white ${!sidebarOpen ? "justify-center px-0" : ""}`}
-          >
-            <FileText className="h-4 w-4 shrink-0" />
-            {sidebarOpen && "Documents"}
-          </Link>
-        </nav>
-
-        <div className="px-3 pb-5 space-y-1.5">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => handleLogout()}
-            className={`flex items-center justify-start gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/50 hover:text-white hover:bg-white/5 transition-colors w-full ${!sidebarOpen ? "justify-center px-0" : ""}`}
-          >
-            <LogOut className="h-4 w-4 shrink-0" />
-            {sidebarOpen && "Déconnexion"}
-          </Button>
-          <Link
-            href="/account"
-            className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors ${!sidebarOpen ? "justify-center px-0" : ""}`}
-          >
-            <div className="h-7 w-7 rounded-full bg-white/10 flex items-center justify-center shrink-0">
-              <User className="h-3.5 w-3.5 text-white/60" />
-            </div>
-            {sidebarOpen && (
-              <span className="text-xs text-white/40 truncate">
-                {user?.email ?? ""}
-              </span>
-            )}
-          </Link>
-        </div>
-      </aside>
+      <Sidebar
+        sidebarOpen={sidebarOpen}
+        activeRoute="dashboard"
+        user={user}
+        onLogout={handleLogout}
+      />
 
       {/* Main */}
       <main
@@ -142,10 +98,10 @@ export function DashboardClient({ user, initialCvs }: DashboardClientProps) {
               </Button>
               <div>
                 <h1 className="text-3xl font-black tracking-tight">
-                  Documents
+                  {t("pageTitle")}
                 </h1>
                 <p className="text-sm text-muted-foreground mt-0.5">
-                  Gérez et créez vos CV
+                  {t("pageSubtitle")}
                 </p>
               </div>
             </div>
@@ -155,7 +111,7 @@ export function DashboardClient({ user, initialCvs }: DashboardClientProps) {
                 onClick={() => router.push("/cv/start")}
               >
                 <Plus className="h-4 w-4" />
-                Nouveau CV
+                {t("newCv")}
               </Button>
             )}
           </div>
@@ -165,10 +121,10 @@ export function DashboardClient({ user, initialCvs }: DashboardClientProps) {
         <div className="border-b border-border bg-background px-8 lg:px-12">
           <div className="flex gap-8">
             <Button type="button" variant="ghost" className="py-3 text-sm font-semibold hover:bg-transparent text-foreground border-b-2 border-primary rounded-none h-auto">
-              CVs
+              {t("tabCvs")}
             </Button>
             <Button type="button" variant="ghost" className="py-3 text-sm font-medium hover:bg-transparent text-muted-foreground hover:text-foreground transition-colors rounded-none h-auto">
-              Lettres de motivation
+              {t("tabCoverLetters")}
             </Button>
           </div>
         </div>
@@ -190,18 +146,17 @@ export function DashboardClient({ user, initialCvs }: DashboardClientProps) {
                 </div>
               </div>
               <h3 className="text-xl font-black tracking-tight mb-2">
-                Vous n&apos;avez pas encore de CV.
+                {t("emptyTitle")}
               </h3>
               <p className="text-muted-foreground text-sm mb-8 max-w-xs">
-                Créez votre premier CV en quelques minutes et téléchargez-le en
-                PDF.
+                {t("emptyDescription")}
               </p>
               <Button
                 className="h-12 px-8 rounded-xl text-sm font-semibold gap-2"
                 onClick={() => router.push("/cv/start")}
               >
                 <Plus className="h-4 w-4" />
-                Créer mon premier CV
+                {t("createFirstCv")}
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
@@ -221,7 +176,7 @@ export function DashboardClient({ user, initialCvs }: DashboardClientProps) {
                       {cv.completed && (
                         <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-[#ecfdf5] px-2.5 py-1 rounded-lg">
                           <CheckCircle className="h-3 w-3" />
-                          Terminé
+                          {t("completed")}
                         </span>
                       )}
                     </div>
@@ -255,7 +210,7 @@ export function DashboardClient({ user, initialCvs }: DashboardClientProps) {
                       {cv.title}
                     </h3>
                     <p className="text-xs text-muted-foreground truncate">
-                      {cv.fullName || "Sans nom"}
+                      {cv.fullName || tCommon("noName")}
                     </p>
                     {cv.jobTitle && (
                       <p className="text-xs text-muted-foreground/60 mt-0.5 truncate">

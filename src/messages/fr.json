@@ -22,7 +22,9 @@
     "present": "Présent",
     "defaultCvFilename": "CV",
     "selectDatePlaceholder": "Sélectionner",
-    "selectDateTitle": "Sélectionner une date"
+    "selectDateTitle": "Sélectionner une date",
+    "langFr": "FR",
+    "langEn": "EN"
   },
   "header": {
     "login": "Connexion",
@@ -36,9 +38,7 @@
     "aboutTitle": "À propos",
     "contactUs": "Nous contacter",
     "terms": "Conditions générales de vente",
-    "privacy": "Politique de confidentialité",
-    "langFr": "FR",
-    "langEn": "EN"
+    "privacy": "Politique de confidentialité"
   },
   "hero": {
     "socialProofHighlight": "+1 000",
@@ -169,6 +169,11 @@
       "sendError": "Erreur lors de l'envoi"
     }
   },
+  "sidebar": {
+    "documents": "Documents",
+    "account": "Mon compte",
+    "logout": "Déconnexion"
+  },
   "dashboard": {
     "sidebarDocuments": "Documents",
     "logout": "Déconnexion",
@@ -266,6 +271,14 @@
     "toast": {
       "loginOk": "Connexion réussie",
       "registerOk": "Inscription réussie"
+    },
+    "modal": {
+      "titleFinalize": "Sauvegardez votre",
+      "titleFinalizeHighlight": "CV",
+      "subtitleFinalize": "Votre CV est prêt ! Créez un compte gratuit pour le sauvegarder et le télécharger.",
+      "titleImport": "Analysez votre",
+      "titleImportHighlight": "CV existant",
+      "subtitleImport": "Créez un compte gratuit pour analyser et améliorer votre CV existant."
     }
   },
   "cvStart": {

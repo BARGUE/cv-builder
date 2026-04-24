@@ -125,7 +125,11 @@ export interface Step7Props {
 export interface CVNewProps {
   initialCvData?: CVData | null;
   initialCvId?: string;
-  user: MeResponse;
+  user: MeResponse | null;
+}
+
+export interface ImportCVProps {
+  isAuthenticated: boolean;
 }
 
 export interface CVPreviewProps {

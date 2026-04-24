@@ -22,7 +22,9 @@
     "present": "Present",
     "defaultCvFilename": "Resume",
     "selectDatePlaceholder": "Select",
-    "selectDateTitle": "Select a date"
+    "selectDateTitle": "Select a date",
+    "langFr": "FR",
+    "langEn": "EN"
   },
   "header": {
     "login": "Log in",
@@ -36,9 +38,7 @@
     "aboutTitle": "About",
     "contactUs": "Contact Us",
     "terms": "Terms and Conditions of Sale",
-    "privacy": "Privacy Policy",
-    "langFr": "FR",
-    "langEn": "EN"
+    "privacy": "Privacy Policy"
   },
   "hero": {
     "socialProofHighlight": "+1,000",
@@ -169,6 +169,11 @@
       "sendError": "Error while sending"
     }
   },
+  "sidebar": {
+    "documents": "Documents",
+    "account": "My Account",
+    "logout": "Log out"
+  },
   "dashboard": {
     "sidebarDocuments": "Documents",
     "logout": "Log out",
@@ -266,6 +271,14 @@
     "toast": {
       "loginOk": "Logged in successfully",
       "registerOk": "Signed up successfully"
+    },
+    "modal": {
+      "titleFinalize": "Save your",
+      "titleFinalizeHighlight": "resume",
+      "subtitleFinalize": "Your resume is ready! Create a free account to save and download it.",
+      "titleImport": "Analyze your",
+      "titleImportHighlight": "existing resume",
+      "subtitleImport": "Create a free account to analyze and improve your existing resume."
     }
   },
   "cvStart": {

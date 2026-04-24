@@ -11,26 +11,24 @@ type Props = {
 };
 
 const CVIdPage = async ({ params }: Props) => {
-  const token = await getToken();
-  if (!token) {
-    redirect("/");
-  }
   const { id } = await params;
+  const token = await getToken();
 
   const fetchUserAndCv = async () => {
     switch (id) {
       case "start":
         return { type: "start" as const };
       case "import":
-        return { type: "import" as const };
+        return { type: "import" as const, isAuthenticated: !!token };
       case "new": {
-        const user = await getMe(token);
+        const user = token ? await getMe(token) : null;
         return { type: "new" as const, user };
       }
       default: {
+        if (!token) redirect("/");
         const [user, initialCvData] = await Promise.all([
-          getMe(token),
-          getCvApi(id, token),
+          getMe(token as string),
+          getCvApi(id, token as string),
         ]);
         return { type: "edit" as const, user, initialCvData };
       }
@@ -40,7 +38,7 @@ const CVIdPage = async ({ params }: Props) => {
   try {
     const result = await fetchUserAndCv();
     if (result.type === "start") return <CVStart />;
-    if (result.type === "import") return <ImportCV />;
+    if (result.type === "import") return <ImportCV isAuthenticated={result.isAuthenticated} />;
     if (result.type === "new") {
       return (
         <CVNew

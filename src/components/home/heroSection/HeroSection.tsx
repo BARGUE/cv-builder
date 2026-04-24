@@ -7,8 +7,17 @@ import { motion } from "framer-motion";
 import heroPerson from "@/public/assets/hero-person.jpg";
 import { fadeUp } from "@/src/lib/animations";
 import { FloatingCard } from "./FloatingCard";
+import { useTranslations } from "next-intl";
 
 export function HeroSection() {
+  const t = useTranslations("hero");
+
+  const stats = [
+    { val: t("stat100"), label: t("stat100Label") },
+    { val: t("stat6"), label: t("stat6Label") },
+    { val: t("stat5min"), label: t("stat5minLabel") },
+  ];
+
   return (
     <section className="relative overflow-hidden pt-16">
       <div className="absolute inset-0 bg-[hsl(235,40%,14%)]" />
@@ -34,7 +43,7 @@ export function HeroSection() {
                 ))}
               </div>
               <span className="text-sm text-white/60">
-                <span className="text-[hsl(238,66%,70%)] font-semibold">+1 000</span> d'utilisateurs satisfaits
+                <span className="text-[hsl(238,66%,70%)] font-semibold">{t("socialProofHighlight")}</span> {t("socialProofRest")}
               </span>
             </motion.div>
 
@@ -45,19 +54,19 @@ export function HeroSection() {
               variants={fadeUp}
               className="text-4xl sm:text-5xl lg:text-[3.5rem] font-black tracking-tight leading-[1.1] text-white"
             >
-              Créez un CV en ligne
+              {t("titleLine1")}
               <br />
-              en toute simplicité
+              {t("titleLine2")}
             </motion.h1>
 
             <motion.p custom={2} initial="hidden" animate="visible" variants={fadeUp} className="text-base text-white/50 max-w-md leading-relaxed">
-              Créez un CV en quelques minutes grâce à nos modèles approuvés par les recruteurs. 6 templates professionnels, aperçu temps réel.
+              {t("description")}
             </motion.p>
 
             <motion.div custom={3} initial="hidden" animate="visible" variants={fadeUp} className="flex flex-wrap items-center gap-4 pt-1">
               <Button size="lg" className="h-14 px-10 rounded-xl text-base font-semibold gap-2" asChild>
-                <Link href="/auth/register">
-                  Créer mon CV
+                <Link href="/cv/start">
+                  {t("createMyCv")}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
@@ -67,16 +76,12 @@ export function HeroSection() {
                 className="h-14 px-10 rounded-xl text-base font-medium border-white/15 text-white hover:bg-white/10 hover:text-white bg-transparent"
                 asChild
               >
-                <Link href="/auth/login">J'ai déjà un compte</Link>
+                <Link href="/auth/login">{t("alreadyHaveAccount")}</Link>
               </Button>
             </motion.div>
 
             <motion.div custom={4} initial="hidden" animate="visible" variants={fadeUp} className="flex flex-wrap gap-8 pt-3">
-              {[
-                { val: "100%", label: "gratuit" },
-                { val: "6", label: "templates" },
-                { val: "5 min", label: "pour créer" },
-              ].map(({ val, label }) => (
+              {stats.map(({ val, label }) => (
                 <div key={label} className="text-sm">
                   <span className="font-bold text-white">{val}</span>{" "}
                   <span className="text-white/40">{label}</span>
@@ -94,7 +99,7 @@ export function HeroSection() {
             <div className="relative w-72 md:w-80 lg:w-[340px]">
               <img
                 src={heroPerson.src}
-                alt="Utilisatrice créant son CV"
+                alt={t("heroImageAlt")}
                 className="w-full rounded-2xl object-cover shadow-2xl"
                 style={{ aspectRatio: "3/4" }}
               />

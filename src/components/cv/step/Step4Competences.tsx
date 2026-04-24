@@ -2,6 +2,7 @@
 
 import { Plus, Trash2 } from "lucide-react";
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import type { CVData } from "@/src/types/cv";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -9,6 +10,7 @@ import { ValidatedField, useFieldValidAtPath } from "@/src/lib/validations/valid
 
 export function Step4Competences() {
   const { control } = useFormContext<CVData>();
+  const t = useTranslations("cvEditor");
   const { fields, append, remove } = useFieldArray({
     control,
     name: "skills",
@@ -37,7 +39,7 @@ export function Step4Competences() {
         className="w-full h-12 rounded-xl border-dashed gap-2 hover:border-primary hover:bg-primary/10 hover:text-primary"
       >
         <Plus className="h-4 w-4" />
-        Ajouter une compétence
+        {t("step4.addSkill")}
       </Button>
     </div>
   );
@@ -51,6 +53,7 @@ function SkillRow({
   onRemove: () => void;
 }) {
   const { control, register } = useFormContext<CVData>();
+  const t = useTranslations("cvEditor");
   const nameValid = useFieldValidAtPath(`skills.${index}.name`);
 
   return (
@@ -59,7 +62,7 @@ function SkillRow({
         <ValidatedField isValid={nameValid.isValid} error={nameValid.error}>
           <Input
             className="h-11 rounded-xl"
-            placeholder="ex. JavaScript"
+            placeholder={t("step4.skillPlaceholder")}
             maxLength={100}
             {...register(`skills.${index}.name`)}
           />

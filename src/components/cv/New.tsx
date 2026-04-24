@@ -23,18 +23,20 @@ import { useForm, FormProvider, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TEMPLATES } from "@/src/lib/utils";
 import TemplateModal from "./modal/template";
+import { useTranslations } from "next-intl";
 import { createCvAction, updateCvAction } from "@/src/app/[locale]/actions/cv";
 import { cvDataSchema } from "@/src/lib/validations/cv";
 import { myToast } from "@/src/components/ui/toast";
+import { AuthModal } from "@/src/components/auth/AuthModal";
 
 const steps = [
-  { num: 1, label: "Coordonnées", icon: UserCircle },
-  { num: 2, label: "Expérience professionnelle", icon: Briefcase },
-  { num: 3, label: "Diplômes et formations", icon: GraduationCap },
-  { num: 4, label: "Compétences", icon: Zap },
-  { num: 5, label: "Résumé", icon: AlignLeft },
-  { num: 6, label: "Autres sections", icon: Layers },
-  { num: 7, label: "Finaliser", icon: Settings },
+  { num: 1, icon: UserCircle },
+  { num: 2, icon: Briefcase },
+  { num: 3, icon: GraduationCap },
+  { num: 4, icon: Zap },
+  { num: 5, icon: AlignLeft },
+  { num: 6, icon: Layers },
+  { num: 7, icon: Settings },
 ];
 
 const getInitialFormValues = (
@@ -52,6 +54,7 @@ const PREVIEW_CONTAINER_WIDTH = 350;
 const PREVIEW_CONTAINER_HEIGHT = 496;
 
 const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
+  const t = useTranslations("cvEditor");
   const params = useParams<{ id?: string }>();
   const previewContainerRef = useRef<HTMLDivElement>(null);
   const [previewScale, setPreviewScale] = useState(() =>
@@ -64,6 +67,7 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [saved, setSaved] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -75,11 +79,12 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
   const cvData = watch();
 
   useEffect(() => {
-    if (!user) redirect("/");
+    // Only require auth when editing an existing CV
+    if (!user && id) redirect("/");
     if (id !== initialCvId || !initialCvData) return;
     reset(initialCvData);
     setCurrentStep(Math.min(7, Math.max(1, initialCvData.currentStep ?? 1)));
-  }, [id, initialCvId, initialCvData, reset]);
+  }, [id, initialCvId, initialCvData, reset, user]);
 
   useEffect(() => {
     if (id != null || !user) return;
@@ -112,10 +117,10 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
     setDownloading(true);
     try {
       await generatePdfFromNode(pdfRef.current, { title: cvData.title ?? "CV" });
-      myToast.success("PDF téléchargé !");
+      myToast.success(t("toasts.pdfOk"));
     } catch (err) {
       console.error("PDF generation error:", err);
-      myToast.error("Erreur lors de la génération du PDF");
+      myToast.error(t("toasts.pdfError"));
     } finally {
       setDownloading(false);
     }
@@ -126,7 +131,7 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
     if (!file || !file.type.startsWith("image/")) return;
     const reader = new FileReader();
     reader.onload = () => {
-      setValue("photoUrl", reader.result as string);
+      setValue("photoUrl", reader.result as string, { shouldDirty: true });
     };
     reader.readAsDataURL(file);
     e.target.value = "";
@@ -145,7 +150,7 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
       }
       const saved = result.data;
       reset(saved);
-      myToast.success("CV sauvegardé !");
+      myToast.success(t("toasts.saved"));
       return saved;
     } finally {
       setSaving(false);
@@ -153,16 +158,24 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
   }, [id, reset]);
 
   const handleSave = async (param: "done" | "save") => {
+    if (param === "done" && !user) {
+      setShowAuthModal(true);
+      return;
+    }
     if (!isDirty) {
       if (param === "done") {
+        if (!cvData.completed) {
+          const dataToSave = { ...getValues(), currentStep: 7, completed: true };
+          await saveCV(dataToSave, id);
+        }
         router.push("/dashboard");
         router.refresh();
       } else {
-        myToast.warning("Aucun changement à enregistrer");
+        myToast.warning(t("toasts.noChanges"));
       }
       return;
     }
-    const dataToSave = { ...getValues(), currentStep, completed: param === "done" };
+    const dataToSave = { ...getValues(), currentStep, completed: param === "done" || cvData.completed === true };
     if (param === "done") {
       dataToSave.currentStep = 7;
     }
@@ -177,15 +190,6 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
     }
   };
 
-  const stepTitles: Record<number, { title: string; subtitle: string }> = {
-    1: { title: "Commençons par vos coordonnées", subtitle: "Pour aider les employeurs à vous contacter, nous vous recommandons d'ajouter votre nom, votre email et votre numéro de téléphone." },
-    2: { title: "Expérience professionnelle", subtitle: "Ajoutez vos expériences les plus récentes et pertinentes." },
-    3: { title: "Diplômes et formations", subtitle: "Indiquez vos diplômes et formations pertinentes." },
-    4: { title: "Compétences", subtitle: "Listez vos compétences clés et évaluez votre niveau." },
-    5: { title: "Résumé professionnel", subtitle: "Rédigez un court résumé qui met en valeur votre profil." },
-    6: { title: "Autres sections", subtitle: "Ajoutez des langues ou d'autres informations complémentaires." },
-    7: { title: "Finaliser votre CV", subtitle: "Choisissez votre template et donnez un titre à votre CV." },
-  };
 
   const progress = Math.round((currentStep / 7) * 100);
 
@@ -206,7 +210,7 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            Retour au dashboard
+            {t("backToDashboard")}
           </Button>
         </header>
 
@@ -239,7 +243,7 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
                       }`}>
                       {isPast ? <Check className="h-3.5 w-3.5" /> : <StepIcon className="h-3.5 w-3.5" />}
                     </div>
-                    <span className="leading-tight truncate">{step.label}</span>
+                    <span className="leading-tight truncate">{t(`steps.${step.num - 1}.label`)}</span>
                   </Button>
                 );
               })}
@@ -247,7 +251,7 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
 
             <div className="px-4 pb-6">
               <div className="rounded-xl bg-white/5 p-4">
-                <p className="text-[10px] uppercase tracking-widest text-white/40 font-semibold mb-2">Progression</p>
+                <p className="text-[10px] uppercase tracking-widest text-white/40 font-semibold mb-2">{t("progress")}</p>
                 <div className="flex items-center gap-3">
                   <div className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
                     <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }} />
@@ -266,11 +270,11 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
                     <div className="mb-8">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-lg">
-                          Étape {currentStep}
+                          {t("stepBadge", { step: currentStep })}
                         </span>
                       </div>
-                      <h1 className="text-2xl font-black tracking-tight">{stepTitles[currentStep].title}</h1>
-                      <p className="text-muted-foreground text-sm mt-1">{stepTitles[currentStep].subtitle}</p>
+                      <h1 className="text-2xl font-black tracking-tight">{t(`stepTitles.${currentStep}.title`)}</h1>
+                      <p className="text-muted-foreground text-sm mt-1">{t(`stepTitles.${currentStep}.subtitle`)}</p>
                     </div>
 
                     {/* Step 1: Coordonnées */}
@@ -327,7 +331,7 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
                     onClick={() => setShowTemplateModal(true)}
                   >
                     <Layers className="h-4 w-4" />
-                    Changer de modèle
+                    {t("changeTemplate")}
                   </Button>
                 </div>
               </div>
@@ -342,14 +346,14 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
                   className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  {currentStep > 1 ? 'Précédent' : 'Dashboard'}
+                  {currentStep > 1 ? t("footer.previous") : t("footer.dashboard")}
                 </Button>
                 <div className="flex items-center gap-3">
                   {/* {!stepValid && currentStep < 7 && (
                     <p className="text-xs text-destructive font-medium">Champs obligatoires manquants</p>
                   )} */}
                   <Button variant="outline" size="sm" className="rounded-xl gap-1.5" onClick={() => handleSave('save')} disabled={saving}>
-                    {saved ? <><Check className="h-3.5 w-3.5" /> Sauvegardé</> : saving ? "..." : <><Save className="h-3.5 w-3.5" /> Sauvegarder</>}
+                    {saved ? <><Check className="h-3.5 w-3.5" /> {t("footer.saved")}</> : saving ? "..." : <><Save className="h-3.5 w-3.5" /> {t("footer.save")}</>}
                   </Button>
                   {currentStep < 7 ? (
                     <Button
@@ -358,7 +362,7 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
                       onClick={() => setCurrentStep(currentStep + 1)}
                     // disabled={!stepValid}
                     >
-                      Suivant
+                      {t("footer.next")}
                       <ChevronRight className="h-3.5 w-3.5" />
                     </Button>
                   ) : (
@@ -367,10 +371,10 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
                         onClick={handleDownloadPDF}
                         disabled={downloading}>
                         <Download className="h-3.5 w-3.5" />
-                        {downloading ? "..." : "PDF"}
+                        {downloading ? "..." : t("footer.pdf")}
                       </Button>
                       <Button size="sm" className="rounded-xl gap-1.5" onClick={() => handleSave('done')}>
-                        Terminer
+                        {t("footer.finish")}
                         <Check className="h-3.5 w-3.5" />
                       </Button>
                     </>
@@ -389,6 +393,16 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
       </div> 
 
       <TemplateModal showTemplateModal={showTemplateModal} setShowTemplateModal={setShowTemplateModal} cvData={cvData} setValue={setValue} />
+
+      <AuthModal
+        open={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => {
+          setShowAuthModal(false);
+          handleSave("done");
+        }}
+        context="finalize"
+      />
     </>
   );
 };

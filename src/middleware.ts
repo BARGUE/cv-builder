@@ -7,7 +7,8 @@ const handleI18nRouting = createMiddleware(routing);
 const locales = routing.locales;
 const defaultLocale = routing.defaultLocale;
 
-const PROTECTED_PATHS = ["/dashboard", "/account", "/cv"];
+const PROTECTED_PATHS = ["/dashboard", "/account"];
+const UNPROTECTED_CV_PATHS = ["/cv/start", "/cv/new", "/cv/import"];
 
 const systemRoutes = [
   "appspecific",
@@ -34,6 +35,8 @@ function stripLocalePrefix(pathname: string): string {
 }
 
 function isProtectedPath(path: string): boolean {
+  if (UNPROTECTED_CV_PATHS.includes(path)) return false;
+  if (path === "/cv" || path.startsWith("/cv/")) return true;
   return PROTECTED_PATHS.some((p) => path === p || path.startsWith(`${p}/`));
 }
 
