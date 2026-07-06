@@ -1,5 +1,21 @@
 # CVBuilder
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Radix_UI-161618?style=for-the-badge&logo=radixui&logoColor=white" alt="Radix UI" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/next--intl-i18n-EC4899?style=for-the-badge&logo=i18next&logoColor=white" alt="next-intl" />
+  <img src="https://img.shields.io/badge/React_Hook_Form-EC5990?style=for-the-badge&logo=reacthookform&logoColor=white" alt="React Hook Form" />
+  <img src="https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white" alt="Zod" />
+  <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
+  <img src="https://img.shields.io/badge/Anthropic_Claude-D97757?style=for-the-badge&logo=anthropic&logoColor=white" alt="Anthropic Claude" />
+</p>
+
 Application web de création de CV professionnels : inscription, éditeur guidé en 7 étapes, import de CV existant assisté par IA, multiples templates, aperçu en temps réel, export PDF et interface bilingue (FR / EN).
 
 > Frontend **Next.js 16** (App Router, React 19, TypeScript). L’application ne persiste pas les données elle‑même : elle s’appuie sur une **API backend** externe (configurée via `AUTH_API_URL`) pour l’authentification et le stockage des CV.
