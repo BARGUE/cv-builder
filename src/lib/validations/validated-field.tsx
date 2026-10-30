@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useFormContext } from "react-hook-form";
+import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 
@@ -11,9 +12,11 @@ function isValueFilled(value: unknown): boolean {
 
 export function useFieldValidAtPath(path: string): { error?: string; isValid: boolean } {
   const { getFieldState, formState, watch } = useFormContext();
+  const t = useTranslations("validation");
   const value = watch(path);
   const state = getFieldState(path, formState);
-  const error = state?.error?.message as string | undefined;
+  const errorKey = state?.error?.message;
+  const error = errorKey ? (t.has(errorKey) ? t(errorKey) : errorKey) : undefined;
   const valueFilled = isValueFilled(value);
   const isValid = !error && valueFilled;
   return { error, isValid: Boolean(isValid) };

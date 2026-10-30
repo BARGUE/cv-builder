@@ -11,7 +11,7 @@ const CVStart = () => {
   return (
     <div className="min-h-screen bg-muted/30">
       {/* Top bar */}
-      <header className="border-b border-border bg-background px-6 lg:px-12 h-16 flex items-center justify-between">
+      <header className="border-b border-border bg-background px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between">
         <button onClick={() => router.push("/dashboard")} className="flex items-center gap-2.5">
           <div className="h-8 w-8 rounded-lg bg-[hsl(235,40%,14%)] flex items-center justify-center">
             <FileText className="h-4 w-4 text-white" />
@@ -23,25 +23,25 @@ const CVStart = () => {
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          {t("backToDashboard")}
+          <span className="hidden sm:inline">{t("backToDashboard")}</span>
         </button>
       </header>
 
       {/* Content */}
-      <div className="flex flex-col items-center justify-center px-6 py-28">
-        <h1 className="text-3xl font-black tracking-tight mb-12 text-center">
+      <div className="flex flex-col items-center justify-center px-4 sm:px-6 py-10 sm:py-28">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-8 sm:mb-12 text-center">
           {t("title")}
         </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-3xl w-full">
           {/* Option 1: From scratch */}
           <button
             onClick={() => router.push("/cv/new")}
-            className="group relative rounded-2xl border border-border bg-card p-6 text-left hover:shadow-lg hover:border-primary/20 transition-all duration-200 flex items-center gap-5"
+            className="group relative rounded-2xl border border-border bg-card p-4 sm:p-6 text-left hover:shadow-lg hover:border-primary/20 transition-all duration-200 flex items-center gap-4 sm:gap-5"
           >
             {/* Icon block */}
-            <div className="h-20 w-20 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0">
-              <PenLine className="h-8 w-8 text-primary/60" />
+            <div className="h-14 w-14 sm:h-20 sm:w-20 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0">
+              <PenLine className="h-6 w-6 sm:h-8 sm:w-8 text-primary/60" />
             </div>
             {/* Text */}
             <div className="flex-1 min-w-0">
@@ -59,7 +59,7 @@ const CVStart = () => {
           </button>
 
           {/* Option 2: Import */}
-          <button onClick={() => router.push("/cv/import")} className="group relative rounded-2xl border border-border bg-card p-6 text-left hover:shadow-lg hover:border-primary/20 transition-all duration-200 flex items-center gap-5">
+          <button onClick={() => router.push("/cv/import")} className="group relative rounded-2xl border border-border bg-card p-4 sm:p-6 text-left hover:shadow-lg hover:border-primary/20 transition-all duration-200 flex items-center gap-4 sm:gap-5">
             {/* Badge */}
             <div className="absolute -top-3 right-5">
               <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold bg-[hsl(235,40%,14%)] text-white px-3.5 py-1.5 rounded-full">
@@ -68,8 +68,8 @@ const CVStart = () => {
               </span>
             </div>
             {/* Icon block */}
-            <div className="h-20 w-20 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0">
-              <FileInput className="h-8 w-8 text-primary/60" />
+            <div className="h-14 w-14 sm:h-20 sm:w-20 rounded-2xl bg-primary/5 flex items-center justify-center shrink-0">
+              <FileInput className="h-6 w-6 sm:h-8 sm:w-8 text-primary/60" />
             </div>
             {/* Text */}
             <div className="flex-1 min-w-0">

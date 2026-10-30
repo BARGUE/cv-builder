@@ -1,13 +1,12 @@
+"use client";
+
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/src/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover";
 import { Button } from "@/src/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 
-const MONTHS = [
-    "Jan", "Fév", "Mar", "Avr", "Mai", "Juin",
-    "Juil", "Aoû", "Sep", "Oct", "Nov", "Déc",
-];
 
 const ITEM_HEIGHT = 40;
 const VISIBLE_ITEMS = 5;
@@ -31,28 +30,6 @@ function ScrollColumn({ items, selected, onChange }: ScrollColumnProps) {
     const lastTouchRef = useRef(0);
     const isDraggingRef = useRef(false);
 
-    // Sync offset when selected changes externally
-    useEffect(() => {
-        const targetOffset = selectedIndex * ITEM_HEIGHT;
-        if (Math.abs(offsetRef.current - targetOffset) > 1) {
-            animateTo(targetOffset);
-        }
-    }, [selectedIndex]);
-
-    const clampOffset = useCallback((o: number) => {
-        return Math.max(0, Math.min((items.length - 1) * ITEM_HEIGHT, o));
-    }, [items.length]);
-
-    const snapToNearest = useCallback((currentOffset: number) => {
-        const index = Math.round(currentOffset / ITEM_HEIGHT);
-        const clampedIndex = Math.max(0, Math.min(items.length - 1, index));
-        const targetOffset = clampedIndex * ITEM_HEIGHT;
-        animateTo(targetOffset);
-        if (items[clampedIndex] && items[clampedIndex].value !== selected) {
-            onChange(items[clampedIndex].value);
-        }
-    }, [items, selected, onChange]);
-
     const animateTo = useCallback((target: number) => {
         if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
 
@@ -72,6 +49,28 @@ function ScrollColumn({ items, selected, onChange }: ScrollColumnProps) {
         };
         animFrameRef.current = requestAnimationFrame(step);
     }, []);
+
+    // Sync offset when selected changes externally
+    useEffect(() => {
+        const targetOffset = selectedIndex * ITEM_HEIGHT;
+        if (Math.abs(offsetRef.current - targetOffset) > 1) {
+            animateTo(targetOffset);
+        }
+    }, [selectedIndex, animateTo]);
+
+    const clampOffset = useCallback((o: number) => {
+        return Math.max(0, Math.min((items.length - 1) * ITEM_HEIGHT, o));
+    }, [items.length]);
+
+    const snapToNearest = useCallback((currentOffset: number) => {
+        const index = Math.round(currentOffset / ITEM_HEIGHT);
+        const clampedIndex = Math.max(0, Math.min(items.length - 1, index));
+        const targetOffset = clampedIndex * ITEM_HEIGHT;
+        animateTo(targetOffset);
+        if (items[clampedIndex] && items[clampedIndex].value !== selected) {
+            onChange(items[clampedIndex].value);
+        }
+    }, [items, selected, onChange, animateTo]);
 
     // Momentum deceleration after touch release
     const startMomentum = useCallback(() => {
@@ -214,12 +213,14 @@ interface ScrollDatePickerProps {
 export function ScrollDatePicker({
     value,
     onChange,
-    placeholder = "Sélectionner",
+    placeholder,
     className,
 }: ScrollDatePickerProps) {
+    const t = useTranslations("common");
+    const monthLabels = useTranslations("date").raw("monthsScroll") as string[];
     const [open, setOpen] = useState(false);
 
-    const parseValue = () => {
+    const parseValue = (value: string) => {
         const now = new Date();
         if (!value) return { month: now.getMonth() + 1, year: now.getFullYear() };
         const parts = value.split(/[\/\-\.]/);
@@ -232,17 +233,19 @@ export function ScrollDatePicker({
         return { month: now.getMonth() + 1, year: now.getFullYear() };
     };
 
-    const parsed = parseValue();
+    const parsed = parseValue(value);
     const [month, setMonth] = useState(parsed.month);
     const [year, setYear] = useState(parsed.year);
 
-    useEffect(() => {
-        const p = parseValue();
-        setMonth(p.month);
-        setYear(p.year);
-    }, [value]);
+    // Resynchronise la sélection quand la valeur change de l'extérieur (ajustement pendant le rendu, sans effet).
+    const [prevValue, setPrevValue] = useState(value);
+    if (value !== prevValue) {
+        setPrevValue(value);
+        setMonth(parsed.month);
+        setYear(parsed.year);
+    }
 
-    const months = MONTHS.map((label, i) => ({ value: i + 1, label }));
+    const months = monthLabels.map((label, i) => ({ value: i + 1, label }));
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 50 }, (_, i) => {
         const y = currentYear - 30 + i;
@@ -269,13 +272,13 @@ export function ScrollDatePicker({
                     )}
                 >
                     <CalendarIcon className="h-3.5 w-3.5 mr-1.5 shrink-0" />
-                    <span className="truncate">{displayValue || placeholder}</span>
+                    <span className="truncate">{displayValue || placeholder || t("selectDatePlaceholder")}</span>
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-56 p-0 pointer-events-auto" align="start">
                 <div className="p-3">
                     <p className="text-xs font-medium text-muted-foreground mb-2 text-center">
-                        Sélectionner une date
+                        {t("selectDateTitle")}
                     </p>
                     <div className="flex gap-2">
                         <ScrollColumn items={months} selected={month} onChange={setMonth} />
@@ -283,8 +286,18 @@ export function ScrollDatePicker({
                         <ScrollColumn items={years} selected={year} onChange={setYear} />
                     </div>
                     <Button size="sm" className="w-full mt-3 rounded-lg text-xs h-8" onClick={handleConfirm}>
-                        Confirmer
+                        {t("confirm")}
                     </Button>
+                    {value && (
+                        <Button
+                            size="sm"
+                            variant="ghost"
+                            className="w-full mt-1 rounded-lg text-xs h-8 text-muted-foreground"
+                            onClick={() => { onChange(""); setOpen(false); }}
+                        >
+                            {t("clear")}
+                        </Button>
+                    )}
                 </div>
             </PopoverContent>
         </Popover>

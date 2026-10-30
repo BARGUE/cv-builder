@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
-export default function AuthIndexPage() {
-  redirect("/auth/login");
+export default async function AuthIndexPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  redirect(`/${locale}/auth/login`);
 }

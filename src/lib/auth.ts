@@ -1,17 +1,22 @@
 import { cookies } from "next/headers";
-import { SessionExpiredError } from "@/src/services/auth/types";
+
+export const SESSION_COOKIE = "access_token";
+const SESSION_MAX_AGE = 60 * 60 * 24;
 
 export async function getToken(): Promise<string | undefined> {
-  const token = (await cookies()).get("access_token")?.value;
-  return token ?? undefined;
+  return (await cookies()).get(SESSION_COOKIE)?.value;
 }
 
-export function createSessionExpiredError(): SessionExpiredError {
-  const err = new Error("Session expirée") as SessionExpiredError;
-  err.name = "SessionExpiredError";
-  return err;
+export async function setSessionCookie(token: string): Promise<void> {
+  (await cookies()).set(SESSION_COOKIE, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: SESSION_MAX_AGE,
+  });
 }
 
-export function isSessionExpiredError(e: unknown): e is SessionExpiredError {
-  return e instanceof Error && e.name === "SessionExpiredError";
+export async function clearSessionCookie(): Promise<void> {
+  (await cookies()).set(SESSION_COOKIE, "", { path: "/", maxAge: 0 });
 }

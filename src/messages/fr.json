@@ -24,7 +24,8 @@
     "selectDatePlaceholder": "Sélectionner",
     "selectDateTitle": "Sélectionner une date",
     "langFr": "FR",
-    "langEn": "EN"
+    "langEn": "EN",
+    "clear": "Effacer"
   },
   "header": {
     "login": "Connexion",
@@ -187,7 +188,9 @@
     "createFirstCv": "Créer mon premier CV",
     "completed": "Terminé",
     "toastDeleted": "CV supprimé",
-    "toastPdfOk": "PDF téléchargé !"
+    "toastPdfOk": "PDF téléchargé !",
+    "confirmDelete": "Supprimer « {title} » ? Cette action est irréversible.",
+    "toastPdfError": "Erreur lors de la génération du PDF"
   },
   "account": {
     "sidebarDocuments": "Documents",
@@ -215,15 +218,9 @@
       "templateDistribution": "Répartition par template"
     },
     "toasts": {
-      "mustBeLoggedInPhoto": "Vous devez être connecté pour modifier votre photo.",
       "fileMustBeImage": "Le fichier doit être une image (JPEG, PNG, GIF, etc.).",
-      "imageMaxSize": "L'image ne doit pas dépasser 2 Mo.",
       "photoLoaded": "Photo chargée. Cliquez sur « Enregistrer » pour l'appliquer.",
       "cannotReadImage": "Impossible de lire l'image.",
-      "readFileError": "Erreur lors de la lecture du fichier. Réessayez avec une autre image.",
-      "readAborted": "Lecture du fichier annulée.",
-      "unexpectedError": "Erreur inattendue",
-      "cannotLoadImage": "Impossible de charger l'image : {message}",
       "unauthenticated": "Non authentifié",
       "profileUpdated": "Profil mis à jour !",
       "saveError": "Erreur lors de la sauvegarde."
@@ -295,8 +292,7 @@
     "title": "Importer votre CV existant",
     "subtitle": "Profitez des conseils d'experts pour améliorer votre CV.",
     "dropTitle": "Glissez-déposez un fichier ici",
-    "formatsHint": "Format accepté : PDF, DOCX",
-    "pdfOnlyError": "PDF uniquement pour l'instant",
+    "formatsHint": "Formats acceptés : PDF, DOCX (10 Mo max.)",
     "importButton": "Importer",
     "scanningTitle": "Nous importons votre CV...",
     "scanningSubtitle": "Nous organisons vos informations et appliquons votre modèle.",
@@ -308,7 +304,9 @@
     "errors": {
       "analysisFailed": "Erreur lors de l'analyse du CV.",
       "importFailed": "Erreur lors de l'import.",
-      "sessionExpired": "Session expirée. Veuillez vous reconnecter."
+      "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
+      "unsupportedFormat": "Format non pris en charge. Utilisez un fichier PDF ou DOCX.",
+      "tooLarge": "Le fichier ne doit pas dépasser 10 Mo."
     }
   },
   "cvEditor": {
@@ -316,7 +314,6 @@
     "progress": "Progression",
     "stepBadge": "Étape {step}",
     "changeTemplate": "Changer de modèle",
-    "templateModalTitle": "Changer de modèle",
     "accentColor": "Couleur d'accent",
     "footer": {
       "previous": "Précédent",
@@ -331,7 +328,10 @@
       "pdfOk": "PDF téléchargé !",
       "pdfError": "Erreur lors de la génération du PDF",
       "saved": "CV sauvegardé !",
-      "noChanges": "Aucun changement à enregistrer"
+      "noChanges": "Aucun changement à enregistrer",
+      "incomplete": "Certains champs obligatoires sont manquants.",
+      "photoError": "Impossible de charger cette image.",
+      "loginRequired": "Connectez-vous pour enregistrer votre CV."
     },
     "steps": [
       {
@@ -454,7 +454,8 @@
     ],
     "defaults": {
       "cvTitle": "Mon CV"
-    }
+    },
+    "previewButton": "Aperçu"
   },
   "templates": {
     "classic": "Classique",
@@ -518,9 +519,9 @@
   },
   "validation": {
     "phoneRequired": "Téléphone requis",
-    "phoneMax": "Maximum 14 caractères",
-    "phoneDigitsOnly": "Uniquement des chiffres (et espaces)",
-    "phoneMinDigits": "Au moins 10 chiffres",
+    "phoneMax": "Maximum 20 caractères",
+    "phoneDigitsOnly": "Chiffres uniquement (un « + » est autorisé au début)",
+    "phoneMinDigits": "Au moins 8 chiffres",
     "emailRequired": "E-mail requis",
     "emailInvalid": "E-mail invalide",
     "fieldRequired": "Champ requis",
@@ -687,5 +688,10 @@
       "ctaDescription": "Notre équipe est disponible pour répondre à toutes vos interrogations.",
       "ctaButton": "Nous contacter"
     }
+  },
+  "errorPage": {
+    "title": "Une erreur est survenue",
+    "description": "Le service est peut-être momentanément indisponible. Réessayez dans un instant.",
+    "retry": "Réessayer"
   }
 }

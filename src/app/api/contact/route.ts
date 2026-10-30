@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseApiError } from "@/src/services/http";
 
 const AUTH_API_URL = process.env.AUTH_API_URL;
 
@@ -40,15 +41,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (!res.ok) {
-            let errMsg = "Erreur lors de l'envoi";
-            try {
-                const j = (await res.json()) as { message?: unknown };
-                if (typeof j?.message === "string") errMsg = j.message;
-                else if (Array.isArray(j?.message) && j.message[0])
-                    errMsg = String(j.message[0]);
-            } catch {
-                /* ignore */
-            }
+            const errMsg = parseApiError(await res.json().catch(() => null)) ?? "Erreur lors de l'envoi";
             return NextResponse.json({ error: errMsg }, { status: res.status });
         }
 

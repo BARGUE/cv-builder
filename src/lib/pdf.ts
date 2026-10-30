@@ -2,88 +2,26 @@
 
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
-import type { CVData } from "@/src/types/cv";
-import type { DashboardDownloadPdfOptions } from "@/src/types/dashboard";
 
-export async function generatePdfFromNode(
-  node: HTMLElement | null,
-  options?: { title?: string }
-): Promise<void> {
-  if (!node) return;
+/**
+ * Rend un nœud DOM en PDF A4. L'image garde ses proportions ;
+ * si le contenu dépasse une page, il est réparti sur plusieurs pages.
+ */
+export async function generatePdfFromNode(node: HTMLElement, title = "CV"): Promise<void> {
   await document.fonts.ready;
-  const imgData = await toPng(node, {
-    backgroundColor: "#ffffff",
-    pixelRatio: 2,
-    cacheBust: true,
-  });
-  const pdf = new jsPDF({
-    orientation: "portrait",
-    unit: "mm",
-    format: "a4",
-  });
-  const pdfWidth = pdf.internal.pageSize.getWidth();
-  const pdfHeight = pdf.internal.pageSize.getHeight();
-  pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-  const fileName = options?.title ?? "CV";
-  pdf.save(`${fileName}.pdf`);
-}
+  const imgData = await toPng(node, { backgroundColor: "#ffffff", pixelRatio: 2, cacheBust: true });
 
-export type { DashboardDownloadPdfOptions };
+  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const imgHeight = (node.offsetHeight * pageWidth) / node.offsetWidth;
 
-export async function dashboardDownloadPdf(
-  e: { preventDefault(): void; stopPropagation(): void },
-  options: DashboardDownloadPdfOptions
-): Promise<void> {
-  e.preventDefault();
-  e.stopPropagation();
-  const {
-    cv,
-    apiBaseUrl,
-    getNode,
-    isDownloading,
-    onStart,
-    onCvLoaded,
-    onSuccess,
-    onError,
-    onFinish,
-    renderDelayMs = 400,
-  } = options;
-
-  if (isDownloading) return;
-  onStart();
-
-  try {
-    const res = await fetch(`${apiBaseUrl}/${cv.id}`, {
-      credentials: "include",
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      onError("Impossible de charger le CV");
-      onFinish();
-      return;
-    }
-
-    const data = (await res.json()) as CVData;
-    onCvLoaded(data);
-
-    if (getNode) {
-      setTimeout(() => {
-        const el = getNode();
-        if (el) {
-          generatePdfFromNode(el, { title: data.title || "CV" })
-            .then(onSuccess)
-            .catch(() => onError("Erreur lors de la génération du PDF"))
-            .finally(onFinish);
-        } else {
-          onFinish();
-        }
-      }, renderDelayMs);
-    } else {
-      onFinish();
-    }
-  } catch {
-    onError("Erreur lors du chargement du CV");
-    onFinish();
+  // Tolérance de 1 mm pour éviter une page blanche due aux arrondis.
+  const pageCount = Math.max(1, Math.ceil((imgHeight - 1) / pageHeight));
+  for (let page = 0; page < pageCount; page++) {
+    if (page > 0) pdf.addPage();
+    pdf.addImage(imgData, "PNG", 0, -page * pageHeight, pageWidth, imgHeight);
   }
+
+  pdf.save(`${title.replace(/[\\/:*?"<>|]/g, "-") || "CV"}.pdf`);
 }

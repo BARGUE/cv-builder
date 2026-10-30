@@ -34,17 +34,3 @@ export interface UpdateProfilePayload {
     lastName?: string;
     avatarUrl?: string;
 }
-
-export interface LoginResult {
-    accessToken: string;
-    user?: unknown;
-}
-
-export interface RegisterResult {
-    accessToken: string;
-    user?: unknown;
-}
-
-export interface SessionExpiredError extends Error {
-    name: "SessionExpiredError";
-}

@@ -1,79 +1,50 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
-import {
-  createCvApi,
-  updateCvApi,
-  deleteCvApi,
-} from "@/src/services/cv/api";
+import { getTranslations } from "next-intl/server";
+import { runAuthedAction } from "@/src/lib/action";
+import { createCvApi, deleteCvApi, getCvApi, updateCvApi } from "@/src/services/cv/api";
 import type { CVData } from "@/src/types/cv";
 import type { ActionResult } from "@/src/types/api";
 
-async function getToken(): Promise<string | undefined> {
-  const c = await cookies();
-  return c.get("access_token")?.value;
+/** Pages qui affichent des données de CV ([locale] fait partie du chemin). */
+function revalidateCvPages() {
+  revalidatePath("/[locale]/dashboard", "page");
+  revalidatePath("/[locale]/account", "page");
+  revalidatePath("/[locale]/cv/[id]", "page");
 }
 
-export async function createCvAction(
-  payload: CVData
-): Promise<ActionResult<CVData>> {
-  const token = await getToken();
-  if (!token) {
-    return { success: false, error: "Non authentifié" };
-  }
-  try {
+export async function getCvAction(cvId: string): Promise<ActionResult<CVData>> {
+  const t = await getTranslations("serverErrors.pdf");
+  return runAuthedAction(async (token) => {
+    const cv = await getCvApi(cvId, token);
+    if (!cv) throw new Error(t("cannotLoadCv"));
+    return cv;
+  }, t("cvLoadError"));
+}
+
+export async function createCvAction(payload: CVData): Promise<ActionResult<CVData>> {
+  const t = await getTranslations("serverErrors");
+  return runAuthedAction(async (token) => {
     const cv = await createCvApi(payload, token);
-    if (!cv) {
-      return { success: false, error: "Erreur lors de la création" };
-    }
-    revalidatePath("/dashboard");
-    revalidatePath("/account");
-    revalidatePath("/cv/[id]", "page");
-    return { success: true, data: cv };
-  } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Erreur lors de la création";
-    return { success: false, error: message };
-  }
+    revalidateCvPages();
+    return cv;
+  }, t("cvCreateError"));
 }
 
-export async function updateCvAction(
-  cvId: string,
-  payload: CVData
-): Promise<ActionResult<CVData>> {
-  const token = await getToken();
-  if (!token) {
-    return { success: false, error: "Non authentifié" };
-  }
-  try {
+export async function updateCvAction(cvId: string, payload: CVData): Promise<ActionResult<CVData>> {
+  const t = await getTranslations("serverErrors");
+  return runAuthedAction(async (token) => {
     const cv = await updateCvApi(cvId, payload, token);
-    if (!cv) {
-      return { success: false, error: "Erreur lors de la mise à jour" };
-    }
-    revalidatePath("/dashboard");
-    revalidatePath("/account");
-    revalidatePath(`/cv/${cvId}`);
-    revalidatePath("/cv/[id]", "page");
-    return { success: true, data: cv };
-  } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Erreur lors de la mise à jour";
-    return { success: false, error: message };
-  }
+    revalidateCvPages();
+    return cv;
+  }, t("cvUpdateError"));
 }
 
-export async function deleteCvAction(cvId: string): Promise<ActionResult<void>> {
-  const token = await getToken();
-  if (!token) {
-    return { success: false, error: "Non authentifié" };
-  }
-  const ok = await deleteCvApi(cvId, token);
-  if (!ok) {
-    return { success: false, error: "Erreur lors de la suppression" };
-  }
-  revalidatePath("/dashboard");
-  revalidatePath("/account");
-  revalidatePath("/cv/[id]", "page");
-  return { success: true, data: undefined };
+export async function deleteCvAction(cvId: string): Promise<ActionResult> {
+  const t = await getTranslations("serverErrors");
+  return runAuthedAction(async (token) => {
+    await deleteCvApi(cvId, token);
+    revalidateCvPages();
+  }, t("cvDeleteError"));
 }

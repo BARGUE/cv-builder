@@ -27,11 +27,6 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
-  async redirects() {
-    return [
-      { source: "/cv/[id]", destination: "/cv/[id]", permanent: false },
-    ];
-  },
 };
 
 export default withNextIntl(nextConfig);

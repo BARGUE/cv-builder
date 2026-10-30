@@ -24,7 +24,8 @@
     "selectDatePlaceholder": "Select",
     "selectDateTitle": "Select a date",
     "langFr": "FR",
-    "langEn": "EN"
+    "langEn": "EN",
+    "clear": "Clear"
   },
   "header": {
     "login": "Log in",
@@ -187,7 +188,9 @@
     "createFirstCv": "Create my first Resume",
     "completed": "Completed",
     "toastDeleted": "Resume deleted",
-    "toastPdfOk": "PDF downloaded!"
+    "toastPdfOk": "PDF downloaded!",
+    "confirmDelete": "Delete “{title}”? This cannot be undone.",
+    "toastPdfError": "Error while generating the PDF"
   },
   "account": {
     "sidebarDocuments": "Documents",
@@ -215,15 +218,9 @@
       "templateDistribution": "Distribution by template"
     },
     "toasts": {
-      "mustBeLoggedInPhoto": "You must be logged in to change your photo.",
       "fileMustBeImage": "The file must be an image (JPEG, PNG, GIF, etc.).",
-      "imageMaxSize": "The image must not exceed 2 MB.",
       "photoLoaded": "Photo loaded. Click “Save” to apply it.",
       "cannotReadImage": "Unable to read the image.",
-      "readFileError": "Error while reading the file. Try again with another image.",
-      "readAborted": "File read canceled.",
-      "unexpectedError": "Unexpected error",
-      "cannotLoadImage": "Unable to load image: {message}",
       "unauthenticated": "Unauthenticated",
       "profileUpdated": "Profile updated!",
       "saveError": "Error while saving."
@@ -295,8 +292,7 @@
     "title": "Import your existing resume",
     "subtitle": "Benefit from expert advice to improve your resume.",
     "dropTitle": "Drag and drop a file here",
-    "formatsHint": "Accepted format: PDF, DOCX",
-    "pdfOnlyError": "PDF only for now",
+    "formatsHint": "Accepted formats: PDF, DOCX (10 MB max.)",
     "importButton": "Import",
     "scanningTitle": "We are importing your resume...",
     "scanningSubtitle": "We are organizing your information and applying your template.",
@@ -308,7 +304,9 @@
     "errors": {
       "analysisFailed": "Error while analyzing the resume.",
       "importFailed": "Error during import.",
-      "sessionExpired": "Session expired. Please log in again."
+      "sessionExpired": "Session expired. Please log in again.",
+      "unsupportedFormat": "Unsupported format. Please use a PDF or DOCX file.",
+      "tooLarge": "The file must not exceed 10 MB."
     }
   },
   "cvEditor": {
@@ -316,7 +314,6 @@
     "progress": "Progress",
     "stepBadge": "Step {step}",
     "changeTemplate": "Change template",
-    "templateModalTitle": "Change template",
     "accentColor": "Accent color",
     "footer": {
       "previous": "Previous",
@@ -331,7 +328,10 @@
       "pdfOk": "PDF downloaded!",
       "pdfError": "Error while generating the PDF",
       "saved": "Resume saved!",
-      "noChanges": "No changes to save"
+      "noChanges": "No changes to save",
+      "incomplete": "Some required fields are missing.",
+      "photoError": "Unable to load this image.",
+      "loginRequired": "Log in to save your resume."
     },
     "steps": [
       {
@@ -454,7 +454,8 @@
     ],
     "defaults": {
       "cvTitle": "My Resume"
-    }
+    },
+    "previewButton": "Preview"
   },
   "templates": {
     "classic": "Classic",
@@ -518,9 +519,9 @@
   },
   "validation": {
     "phoneRequired": "Phone required",
-    "phoneMax": "Maximum 14 characters",
-    "phoneDigitsOnly": "Digits only (and spaces)",
-    "phoneMinDigits": "At least 10 digits",
+    "phoneMax": "Maximum 20 characters",
+    "phoneDigitsOnly": "Digits only (a leading “+” is allowed)",
+    "phoneMinDigits": "At least 8 digits",
     "emailRequired": "Email required",
     "emailInvalid": "Invalid email",
     "fieldRequired": "Required field",
@@ -687,5 +688,10 @@
       "ctaDescription": "Our team is available to answer all your questions.",
       "ctaButton": "Contact Us"
     }
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "description": "The service may be temporarily unavailable. Please try again in a moment.",
+    "retry": "Try again"
   }
 }

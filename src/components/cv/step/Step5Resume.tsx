@@ -14,7 +14,7 @@ export function Step5Resume() {
   const summaryValid = useFieldValidAtPath("summary");
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+    <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4">
       <div className="space-y-1.5">
         <Label className="text-sm font-medium">{t("step5.label")}</Label>
         <ValidatedField isValid={summaryValid.isValid} error={summaryValid.error} variant="textarea" inputClassNameWhenValid="pr-10">

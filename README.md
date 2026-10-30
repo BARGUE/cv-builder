@@ -47,7 +47,7 @@ Application web de création de CV professionnels : inscription, éditeur guidé
 
 - **S’inscrire / se connecter** via une API d’authentification externe (token stocké en cookie `httpOnly`).
 - **Créer un CV pas à pas** grâce à un assistant en 7 étapes (coordonnées, expériences, formation, compétences, résumé, langues, finalisation).
-- **Importer un CV existant** (PDF ou Word) : le document est analysé par un modèle **Claude (Anthropic)** qui en extrait automatiquement les informations structurées.
+- **Importer un CV existant** (PDF ou DOCX, 10 Mo max.) : le document est analysé par un modèle **Claude (Anthropic)** qui en extrait automatiquement les informations structurées.
 - **Choisir un template** et une couleur d’accent, ajouter une photo de profil.
 - **Prévisualiser en temps réel** et **exporter en PDF** côté client.
 - **Gérer son compte** : profil, avatar, mot de passe, statistiques.
@@ -62,25 +62,25 @@ Application web de création de CV professionnels : inscription, éditeur guidé
 | **Éditeur de CV** | Assistant en 7 étapes avec validation (`react-hook-form` + `zod`). |
 | **Import par IA** | Extraction automatique des données depuis un PDF/DOCX via l’API Anthropic. |
 | **Templates** | `classic`, `modern`, `creative`, `compact`, `executive`, `sidebar`, `minimaliste`, `playfair`, `tech`. |
-| **Personnalisation** | Couleur d’accent, photo de profil (upload avec limite 2 Mo). |
+| **Personnalisation** | Couleur d’accent, photo de profil (redimensionnée côté client avant envoi). |
 | **Aperçu temps réel** | Prévisualisation instantanée pendant l’édition. |
 | **Export PDF** | Génération côté client via `html-to-image` + `jsPDF`. |
 | **Dashboard** | Liste des CV, création, édition, suppression, téléchargement. |
 | **Compte** | Profil, avatar, changement de mot de passe, statistiques (`recharts`). |
 | **Contact** | Formulaire relayé vers le backend. |
 | **i18n** | Interface bilingue **français / anglais** (`next-intl`). |
-| **Responsive & animations** | Détection du device via middleware, animations `framer-motion`. |
+| **Responsive & animations** | Animations `framer-motion`. |
 
 ---
 
 ## Stack technique
 
-- **Framework** : Next.js 16 (App Router, Server Actions, middleware)
+- **Framework** : Next.js 16 (App Router, Server Actions, proxy)
 - **UI** : React 19, Tailwind CSS 4, Radix UI (Accordion, Avatar, Dialog, Label, Popover)
 - **Formulaires & validation** : react-hook-form, zod, @hookform/resolvers
 - **Internationalisation** : next-intl (locales `fr` / `en`)
 - **IA** : @anthropic-ai/sdk (analyse de CV importés)
-- **Parsing de documents** : mammoth (DOCX), pdf-parse (PDF)
+- **Parsing de documents** : mammoth (DOCX → texte) ; les PDF sont envoyés tels quels à Claude
 - **Export PDF** : jsPDF, html-to-image
 - **Graphiques** : Recharts
 - **Animations** : Framer Motion
@@ -149,6 +149,7 @@ ANTHROPIC_API_KEY=sk-ant-...
 | `npm run build` | Build de production (sortie dans `.next`).                         |
 | `npm run start` | Démarre le serveur de production (après `npm run build`).          |
 | `npm run lint`  | Analyse statique du code avec ESLint.                              |
+| `npm run typecheck` | Vérification des types TypeScript.                             |
 
 ---
 
@@ -170,27 +171,23 @@ cv-builder/
 │   │   │   ├── cv/[id]/              # Éditeur d’un CV
 │   │   │   └── actions/              # Server Actions (auth.ts, cv.ts, profile.ts)
 │   │   └── api/                      # Routes API internes (non localisées)
-│   │       ├── cv/[id]/              # GET détail d’un CV
 │   │       ├── cv/import/            # POST import de CV via IA (Anthropic)
-│   │       ├── upload/avatar/        # POST upload d’avatar
 │   │       └── contact/              # POST formulaire de contact
 │   ├── components/
 │   │   ├── cv/                       # Éditeur (New, Start, Preview, steps, import, modal)
 │   │   ├── dashboard/                # Dashboard client
 │   │   ├── account/                  # Compte (stats, mot de passe)
-│   │   ├── auth/                     # Modale d’authentification
+│   │   ├── auth/                     # Formulaire, page et modale d’authentification
 │   │   ├── home/                     # Sections de la landing (hero, CTA, etc.)
 │   │   ├── legals/                   # Contenus légaux
 │   │   ├── layout/                   # Sidebar, etc.
 │   │   └── ui/                       # Composants UI réutilisables (Radix + Tailwind)
-│   ├── context/                      # Contexte global (CV + utilisateur)
 │   ├── i18n/                         # Config next-intl (routing, request, navigation)
-│   ├── lib/                          # auth, utils, pdf, animations, validations
+│   ├── lib/                          # auth/session, actions, pdf, image, validations, utils
 │   ├── messages/                     # Traductions (fr.json, en.json)
-│   ├── services/                     # Appels vers l’API backend (auth/, cv/)
+│   ├── services/                     # Appels vers l’API backend (http.ts, auth/, cv/)
 │   ├── types/                        # Types du domaine (cv, api, dashboard, ...)
-│   └── middleware.ts                 # i18n + protection des routes + détection device
-├── public/uploads/avatars/           # Avatars uploadés
+│   └── proxy.ts                      # i18n + protection des routes (ex-middleware, Next 16)
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -213,7 +210,7 @@ Toutes les pages sont préfixées par la locale (`/fr/...` ou `/en/...`).
 | `/{locale}/account`| Protégé  | Compte utilisateur.                           |
 | `/{locale}/cv/[id]`| Protégé  | Éditeur d’un CV.                              |
 
-Les routes protégées (`/dashboard`, `/account`, `/cv/*`) exigent le cookie `access_token` ; sinon l’utilisateur est redirigé vers l’accueil (voir [`src/middleware.ts`](src/middleware.ts)).
+Les routes protégées (`/dashboard`, `/account`, `/cv/*`) exigent le cookie `access_token` ; sinon l’utilisateur est redirigé vers l’accueil (voir [`src/proxy.ts`](src/proxy.ts)).
 
 ---
 
@@ -223,9 +220,7 @@ Ces routes sont servies par Next.js (dossier `src/app/api`) :
 
 | Route                 | Méthode | Rôle                                                                 |
 | --------------------- | ------- | -------------------------------------------------------------------- |
-| `/api/cv/[id]`        | GET     | Récupère le détail d’un CV (authentifié, proxy vers le backend).     |
-| `/api/cv/import`      | POST    | Analyse un document (base64 + mimeType) via Anthropic et retourne un CV structuré. |
-| `/api/upload/avatar`  | POST    | Upload d’un avatar (JPEG/PNG/WebP/GIF, ≤ 2 Mo) dans `public/uploads/avatars`. |
+| `/api/cv/import`      | POST    | Authentifié. Analyse un fichier PDF/DOCX (multipart, champ `file`) via Claude (sortie structurée) et retourne un CV normalisé. |
 | `/api/contact`        | POST    | Relaie le formulaire de contact vers le backend.                     |
 
 ---
@@ -270,18 +265,18 @@ Les appels sont centralisés dans [`src/services/auth/api.ts`](src/services/auth
 ## Authentification & sécurité
 
 - Le token d’accès est stocké dans un cookie **`access_token`** : `httpOnly`, `sameSite=lax`, `secure` en production, durée **24 h**.
-- Le [`middleware.ts`](src/middleware.ts) :
+- Le [`proxy.ts`](src/proxy.ts) :
   - applique le routing i18n,
   - protège `/dashboard`, `/account` et `/cv/*`,
   - redirige les utilisateurs connectés depuis l’accueil vers le dashboard,
   - redirige le sous‑domaine `auth.*` vers le domaine principal,
-  - ajoute les en‑têtes `x-viewport` (type d’appareil) et `x-locale`.
-- Les mutations (création, mise à jour, suppression de CV, auth, profil) passent par des **Server Actions** (`src/app/[locale]/actions/`).
+  - conserve la locale courante dans toutes ses redirections.
+- Les mutations (création, mise à jour, suppression de CV, auth, profil) passent par des **Server Actions** (`src/app/[locale]/actions/`). Elles renvoient un `ActionResult` ; une session expirée est signalée par `code: "UNAUTHORIZED"` (jamais par comparaison de message).
 
 ---
 
 ## Contribution
 
 1. Créer une branche à partir de `develop` (ou de la branche cible).
-2. Développer, puis vérifier avec `npm run lint` et `npm run build`.
+2. Développer, puis vérifier avec `npm run lint`, `npm run typecheck` et `npm run build`.
 3. Ouvrir une Pull Request décrivant clairement les changements.

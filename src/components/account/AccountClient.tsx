@@ -13,7 +13,7 @@ import {
   Mail,
   User,
 } from "lucide-react";
-import { Sidebar } from "@/src/components/layout/Sidebar";
+import { Sidebar, sidebarOffsetClass } from "@/src/components/layout/Sidebar";
 import { useRouter } from "next/navigation";
 import { myToast } from "@/src/components/ui/toast";
 import PasswordChangeModal from "@/src/components/account/PasswordChangeModal";
@@ -22,6 +22,7 @@ import type { AccountClientProps, ProfileFormValues } from "@/src/components/acc
 import { useTranslations } from "next-intl";
 import { logoutAction } from "@/src/app/[locale]/actions/auth";
 import { updateProfileAction } from "@/src/app/[locale]/actions/profile";
+import { resizeImageToDataUrl } from "@/src/lib/image";
 
 const defaultProfileValues: ProfileFormValues = {
   firstName: "",
@@ -76,44 +77,20 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
     await logoutAction();
   };
 
-  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) {
-      return;
-    }
-    if (!user) {
-      myToast.error(t("toasts.mustBeLoggedInPhoto"));
-      e.target.value = "";
-      return;
-    }
+    e.target.value = "";
+    if (!file) return;
     if (!file.type.startsWith("image/")) {
       myToast.error(t("toasts.fileMustBeImage"));
-      e.target.value = "";
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result;
-      if (result && typeof result === "string") {
-        setValue("avatarUrl", result, { shouldDirty: true });
-        myToast.success(t("toasts.photoLoaded"));
-      } else {
-        myToast.error(t("toasts.cannotReadImage"));
-      }
-    };
-    reader.onerror = () => {
-      myToast.error(t("toasts.readFileError"));
-    };
-    reader.onabort = () => {
-      myToast.error(t("toasts.readAborted"));
-    };
     try {
-      reader.readAsDataURL(file);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : t("toasts.unexpectedError");
-      myToast.error(t("toasts.cannotLoadImage", { message: msg }));
+      setValue("avatarUrl", await resizeImageToDataUrl(file, 256), { shouldDirty: true });
+      myToast.success(t("toasts.photoLoaded"));
+    } catch {
+      myToast.error(t("toasts.cannotReadImage"));
     }
-    e.target.value = "";
   };
 
   const handleSaveProfile = async () => {
@@ -127,7 +104,7 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
         avatarUrl: avatarUrl || undefined,
       });
       if (!result.success) {
-        if (result.error === "Non authentifié") {
+        if (result.code === "UNAUTHORIZED") {
           handleUnauthorized();
           return;
         }
@@ -155,20 +132,20 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
       />
 
       {/* Main */}
-      <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-56' : 'ml-16'}`}>
+      <main className={`flex-1 min-w-0 transition-all duration-300 ${sidebarOffsetClass(sidebarOpen)}`}>
         {/* Header */}
-        <header className="bg-background px-8 lg:px-12 pt-10 pb-8">
+        <header className="bg-background px-4 sm:px-8 lg:px-12 pt-6 sm:pt-10 pb-6 sm:pb-8">
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="h-9 w-9 rounded-xl border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              className="h-9 w-9 rounded-xl border border-border hidden md:flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
             >
               {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
             </Button>
             <div>
-              <h1 className="text-3xl font-black tracking-tight">{t("pageTitle")}</h1>
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight">{t("pageTitle")}</h1>
               <p className="text-sm text-muted-foreground mt-0.5">{t("pageSubtitle")}</p>
             </div>
           </div>
@@ -177,12 +154,12 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
         <div className="border-b border-border" />
 
         {/* Content */}
-        <div className="px-8 lg:px-12 py-10 grid grid-cols-1 lg:grid-cols-5 gap-10 max-w-6xl">
+        <div className="px-4 sm:px-8 lg:px-12 py-6 sm:py-10 grid grid-cols-1 lg:grid-cols-5 gap-6 sm:gap-10 max-w-6xl">
           {/* Left: Profile info */}
           <div className="lg:col-span-3 space-y-8">
             {/* Avatar card */}
-            <div className="rounded-2xl border border-border bg-card p-6">
-              <div className="flex items-center gap-6">
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
+              <div className="flex items-center gap-4 sm:gap-6">
                 <div className="relative group">
                   <Avatar className="h-20 w-20 border-2 border-border">
                     {currentValues.avatarUrl ? <AvatarImage src={currentValues.avatarUrl} alt={t("avatarAlt")} /> : null}
@@ -214,13 +191,13 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
             </div>
 
             {/* Informations */}
-            <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-5">
               <h2 className="text-base font-black tracking-tight flex items-center gap-2">
                 <User className="h-4 w-4 text-primary" />
                 {t("personalInfo")}
               </h2>
-              <div className="flex flex-row gap-2">
-                <div className="w-1/2">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
+                <div className="w-full sm:w-1/2">
                   <Label htmlFor="firstName">{t("firstName")}</Label>
                   <Input
                     id="firstName"
@@ -231,7 +208,7 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
                   />
                 </div>
 
-                <div className="w-1/2">
+                <div className="w-full sm:w-1/2">
                   <Label htmlFor="lastName">{t("lastName")}</Label>
                   <Input
                     id="lastName"
@@ -249,7 +226,7 @@ const AccountClient = ({ user, initialCvs }: AccountClientProps) => {
             </div>
 
             {/* Security */}
-            <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-5">
               <h2 className="text-base font-black tracking-tight flex items-center gap-2">
                 <Shield className="h-4 w-4 text-primary" />
                 {t("security")}

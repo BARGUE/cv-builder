@@ -14,6 +14,14 @@ import type { ImportCVProps, ImportPhase } from "@/src/components/cv/types";
 import { createCvAction } from "@/src/app/[locale]/actions/cv";
 import { AuthModal } from "@/src/components/auth/AuthModal";
 
+class SessionError extends Error {}
+
+const ACCEPTED_TYPES = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
 const ImportCV = ({ isAuthenticated: initialIsAuthenticated }: ImportCVProps) => {
   const router = useRouter();
   const t = useTranslations("cvImport");
@@ -29,8 +37,12 @@ const ImportCV = ({ isAuthenticated: initialIsAuthenticated }: ImportCVProps) =>
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleFile = (file: File) => {
-    if (file.type !== "application/pdf") {
-      setError(t("pdfOnlyError"));
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      setError(t("errors.unsupportedFormat"));
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setError(t("errors.tooLarge"));
       return;
     }
     setError(null);
@@ -63,49 +75,47 @@ const ImportCV = ({ isAuthenticated: initialIsAuthenticated }: ImportCVProps) =>
     setSavedCvId(null);
     setPhase("scanning");
     setImporting(true);
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const base64 = (reader.result as string).split(",")[1];
-        const importRes = await fetch("/api/cv/import", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ base64, mimeType: "application/pdf" }),
-        });
-        if (!importRes.ok) {
-          const err = await importRes.json().catch(() => ({}));
-          throw new Error((err as { error?: string }).error ?? t("errors.analysisFailed"));
-        }
-        const data = (await importRes.json()) as CVData;
-        setImportDone(true);
-
-        const saveResult = await createCvAction(data);
-        if (!saveResult.success) {
-          if (saveResult.error === "Non authentifié") {
-            myToast.error(t("errors.sessionExpired"));
-            router.push("/auth/login");
-            setPhase("upload");
-            return;
-          }
-          throw new Error(saveResult.error);
-        }
-        if (saveResult.data?.id) setSavedCvId(saveResult.data.id);
-        setPhase("done");
-      } catch (err) {
-        const message = err instanceof Error ? err.message : t("errors.importFailed");
-        setError(message);
-        myToast.error(message);
-        setPhase("upload");
-      } finally {
-        setImporting(false);
+    try {
+      const body = new FormData();
+      body.append("file", selectedFile);
+      const importRes = await fetch("/api/cv/import", { method: "POST", body });
+      if (!importRes.ok) {
+        if (importRes.status === 401) throw new SessionError();
+        const statusMessages: Record<number, string> = {
+          413: t("errors.tooLarge"),
+          415: t("errors.unsupportedFormat"),
+        };
+        throw new Error(statusMessages[importRes.status] ?? t("errors.analysisFailed"));
       }
-    };
-    reader.readAsDataURL(selectedFile);
+      const data = (await importRes.json()) as CVData;
+      setImportDone(true);
+
+      const saveResult = await createCvAction(data);
+      if (!saveResult.success) {
+        if (saveResult.code === "UNAUTHORIZED") throw new SessionError();
+        throw new Error(saveResult.error);
+      }
+      setSavedCvId(saveResult.data.id ?? null);
+      setPhase("done");
+    } catch (err) {
+      setPhase("upload");
+      if (err instanceof SessionError) {
+        myToast.error(t("errors.sessionExpired"));
+        setIsAuthenticated(false);
+        setShowAuthModal(true);
+        return;
+      }
+      const message = err instanceof Error ? err.message : t("errors.importFailed");
+      setError(message);
+      myToast.error(message);
+    } finally {
+      setImporting(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-muted/30">
-      <header className="border-b border-border bg-background px-6 lg:px-12 h-16 flex items-center justify-between">
+      <header className="border-b border-border bg-background px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between">
         <Button type="button" variant="ghost" onClick={() => router.push("/dashboard")} className="flex items-center gap-2.5">
           <div className="h-8 w-8 rounded-lg bg-[hsl(235,40%,14%)] flex items-center justify-center">
             <FileText className="h-4 w-4 text-white" />
@@ -125,8 +135,8 @@ const ImportCV = ({ isAuthenticated: initialIsAuthenticated }: ImportCVProps) =>
         )}
       </header>
 
-      <div className="flex flex-col items-center justify-center px-6 py-20">
-        <div className="bg-card rounded-2xl border border-border p-10 max-w-xl w-full">
+      <div className="flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-20">
+        <div className="bg-card rounded-2xl border border-border p-5 sm:p-10 max-w-xl w-full">
           <AnimatePresence mode="wait">
             {phase === "upload" && (
               <motion.div key="upload" initial={{ opacity: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.25 }}>
@@ -143,7 +153,7 @@ const ImportCV = ({ isAuthenticated: initialIsAuthenticated }: ImportCVProps) =>
                   onDragOver={handleDrag}
                   onDrop={handleDrop}
                   onClick={() => fileInputRef.current?.click()}
-                  className={`cursor-pointer rounded-2xl border-2 border-dashed p-10 flex flex-col items-center justify-center gap-3 transition-colors ${dragActive
+                  className={`cursor-pointer rounded-2xl border-2 border-dashed p-6 sm:p-10 flex flex-col items-center justify-center gap-3 transition-colors ${dragActive
                     ? "border-primary bg-primary/5"
                     : selectedFile
                       ? "border-primary/40 bg-primary/5"
@@ -179,7 +189,7 @@ const ImportCV = ({ isAuthenticated: initialIsAuthenticated }: ImportCVProps) =>
                         }
                         handleImport();
                       }}
-                      className="rounded-xl px-8"
+                      className="rounded-xl px-8 w-full sm:w-auto"
                     >
                       {t("importButton")}
                     </Button>

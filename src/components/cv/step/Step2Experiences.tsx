@@ -3,7 +3,7 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import type { CVData } from "@/src/types/cv";
+import { emptyExperience, type CVData } from "@/src/types/cv";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Label } from "@/src/components/ui/label";
@@ -21,7 +21,7 @@ function ExperienceCard({ index, onRemove }: { index: number; onRemove: () => vo
   const endDateValid = useFieldValidAtPath(`experiences.${index}.endDate`);
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 space-y-4 relative">
+    <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4 relative">
       <div className="flex items-center justify-between">
         <span className="text-xs font-semibold text-muted-foreground">
           {t("step2.experienceN", { n: index + 1 })}
@@ -36,7 +36,7 @@ function ExperienceCard({ index, onRemove }: { index: number; onRemove: () => vo
           <Trash2 className="h-3.5 w-3.5" />
         </Button>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label className="text-sm font-medium">{t("step2.company")}</Label>
           <ValidatedField isValid={companyValid.isValid} error={companyValid.error}>
@@ -66,7 +66,7 @@ function ExperienceCard({ index, onRemove }: { index: number; onRemove: () => vo
           )}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label className="text-sm font-medium">{t("step2.startDate")}</Label>
           <Controller
@@ -127,27 +127,18 @@ export function Step2Experiences() {
   const { fields, append, remove } = useFieldArray({
     control,
     name: "experiences",
-    keyName: "id",
+    keyName: "key",
   });
 
   return (
     <div className="space-y-4">
       {fields.map((field, i) => (
-        <ExperienceCard key={field.id} index={i} onRemove={() => remove(i)} />
+        <ExperienceCard key={field.key} index={i} onRemove={() => remove(i)} />
       ))}
       <Button
         type="button"
         variant="outline"
-        onClick={() =>
-          append({
-            id: crypto.randomUUID(),
-            company: "",
-            position: "",
-            startDate: "",
-            endDate: "",
-            description: "",
-          })
-        }
+        onClick={() => append(emptyExperience())}
         className="w-full h-12 rounded-xl border-dashed gap-2 hover:border-primary hover:bg-primary/10 hover:text-primary"
       >
         <Plus className="h-4 w-4" />

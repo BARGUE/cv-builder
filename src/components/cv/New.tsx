@@ -1,14 +1,16 @@
 'use client';
 
-import CVPreview from "./Preview";
-import { CVData, defaultCVData } from "@/src/types/cv";
+import { ScaledPreview } from "./ScaledPreview";
+import { createDefaultCVData, type CVData } from "@/src/types/cv";
 import type { CVNewProps } from "@/src/components/cv/types";
+import type { MeResponse } from "@/src/services/auth/types";
 import { Button } from "@/src/components/ui/button";
 import {
   FileText, ChevronLeft, ChevronRight, Save, Check, Layers, Download,
   ArrowLeft, Briefcase, GraduationCap, Zap,
-  AlignLeft, Settings, UserCircle
+  AlignLeft, Settings, UserCircle, Eye
 } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle } from "@/src/components/ui/dialog";
 import { Step1Coordonnees } from "./step/Step1Coordonnees";
 import { Step2Experiences } from "./step/Step2Experiences";
 import { Step3Formation } from "./step/Step3Formation";
@@ -16,18 +18,18 @@ import { Step4Competences } from "./step/Step4Competences";
 import { Step5Resume } from "./step/Step5Resume";
 import { Step6Langues } from "./step/Step6Langues";
 import { Step7Finaliser } from "./step/Step7Finaliser";
-import { generatePdfFromNode } from "@/src/lib/pdf";
-import { redirect, useParams, useRouter } from "next/navigation";
-import { useState, useRef, useEffect, useCallback } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useRef } from "react";
 import { useForm, FormProvider, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TEMPLATES } from "@/src/lib/utils";
 import TemplateModal from "./modal/template";
 import { useTranslations } from "next-intl";
 import { createCvAction, updateCvAction } from "@/src/app/[locale]/actions/cv";
-import { cvDataSchema } from "@/src/lib/validations/cv";
+import { cvDataSchema, STEP_FIELDS } from "@/src/lib/validations/cv";
+import { resizeImageToDataUrl } from "@/src/lib/image";
 import { myToast } from "@/src/components/ui/toast";
 import { AuthModal } from "@/src/components/auth/AuthModal";
+import { usePdfExport } from "./usePdfExport";
 
 const steps = [
   { num: 1, icon: UserCircle },
@@ -37,166 +39,142 @@ const steps = [
   { num: 5, icon: AlignLeft },
   { num: 6, icon: Layers },
   { num: 7, icon: Settings },
-];
+] as const;
+const LAST_STEP = steps.length;
 
-const getInitialFormValues = (
-  id: string | undefined,
-  initialCvId: string | undefined,
-  initialCvData: CVData | null | undefined
-): CVData => {
-  if (id === initialCvId && initialCvData) return initialCvData;
-  return defaultCVData;
-};
+const clampStep = (n: number | undefined) => Math.min(LAST_STEP, Math.max(1, n ?? 1));
 
-const CV_PREVIEW_WIDTH = 595;
-const CV_PREVIEW_HEIGHT = 842;
-const PREVIEW_CONTAINER_WIDTH = 350;
-const PREVIEW_CONTAINER_HEIGHT = 496;
+/** Nouveau CV : pré-remplit l'identité depuis le profil de l'utilisateur connecté. */
+function getInitialValues(initialCvData: CVData | null | undefined, user: MeResponse | null): CVData {
+  if (initialCvData) return initialCvData;
+  const data = createDefaultCVData();
+  if (user) {
+    data.fullName = [user.profile?.firstName, user.profile?.lastName].filter(Boolean).join(" ");
+    data.email = user.email ?? "";
+    data.photoUrl = user.profile?.avatarUrl ?? "";
+  }
+  return data;
+}
+
+type SaveMode = "save" | "done";
 
 const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
   const t = useTranslations("cvEditor");
-  const params = useParams<{ id?: string }>();
-  const previewContainerRef = useRef<HTMLDivElement>(null);
-  const [previewScale, setPreviewScale] = useState(() =>
-    Math.min(PREVIEW_CONTAINER_WIDTH / CV_PREVIEW_WIDTH, PREVIEW_CONTAINER_HEIGHT / CV_PREVIEW_HEIGHT)
-  );
-  const id = params?.id && params.id !== "new" ? params.id : undefined;
   const router = useRouter();
+  const pathname = usePathname();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [cvId, setCvId] = useState(initialCvId);
+  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(user));
+  const [currentStep, setCurrentStep] = useState(() => clampStep(initialCvData?.currentStep));
+  const [furthestStep, setFurthestStep] = useState(currentStep);
   const [saving, setSaving] = useState(false);
-  const [downloading, setDownloading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
   const [saved, setSaved] = useState(false);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const pdfRef = useRef<HTMLDivElement>(null);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [pendingSave, setPendingSave] = useState<SaveMode | null>(null);
+  const { exportPdf, exporting, pdfNode } = usePdfExport();
 
   const form = useForm<CVData>({
     resolver: zodResolver(cvDataSchema) as Resolver<CVData>,
-    defaultValues: getInitialFormValues(id, initialCvId, initialCvData),
+    defaultValues: getInitialValues(initialCvData, user),
   });
-  const { setValue, reset, watch, getValues, formState: { isDirty } } = form;
+  const { setValue, reset, watch, getValues, trigger, getFieldState, formState: { isDirty } } = form;
   const cvData = watch();
 
-  useEffect(() => {
-    // Only require auth when editing an existing CV
-    if (!user && id) redirect("/");
-    if (id !== initialCvId || !initialCvData) return;
-    reset(initialCvData);
-    setCurrentStep(Math.min(7, Math.max(1, initialCvData.currentStep ?? 1)));
-  }, [id, initialCvId, initialCvData, reset, user]);
+  const goToStep = (step: number) => {
+    const next = clampStep(step);
+    setCurrentStep(next);
+    setFurthestStep((f) => Math.max(f, next));
+  };
 
-  useEffect(() => {
-    if (id != null || !user) return;
-    const fullName = [user.profile?.firstName, user.profile?.lastName]
-      .filter(Boolean)
-      .join(" ");
-    if (fullName) setValue("fullName", fullName);
-    if (user.email) setValue("email", user.email);
-    if (user.profile?.avatarUrl) setValue("photoUrl", user.profile.avatarUrl);
-  }, [id, user, setValue]);
-
-  useEffect(() => {
-    const el = previewContainerRef.current;
-    if (!el) return;
-    const updateScale = () => {
-      const w = el.offsetWidth;
-      const h = el.offsetHeight;
-      if (w > 0 && h > 0) {
-        setPreviewScale(Math.min(w / CV_PREVIEW_WIDTH, h / CV_PREVIEW_HEIGHT));
-      }
-    };
-    updateScale();
-    const ro = new ResizeObserver(updateScale);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  const handleDownloadPDF = useCallback(async () => {
-    if (!pdfRef.current) return;
-    setDownloading(true);
+  const handleDownloadPDF = async () => {
     try {
-      await generatePdfFromNode(pdfRef.current, { title: cvData.title ?? "CV" });
+      await exportPdf(getValues());
       myToast.success(t("toasts.pdfOk"));
     } catch (err) {
       console.error("PDF generation error:", err);
       myToast.error(t("toasts.pdfError"));
-    } finally {
-      setDownloading(false);
     }
-  }, [cvData.title]);
-
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      setValue("photoUrl", reader.result as string, { shouldDirty: true });
-    };
-    reader.readAsDataURL(file);
-    e.target.value = "";
   };
 
-  const saveCV = useCallback(async (data: CVData, targetId?: string): Promise<CVData | null> => {
-    setSaving(true);
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
     try {
-      const cvIdToUse = targetId ?? id;
-      const result = cvIdToUse
-        ? await updateCvAction(cvIdToUse, data)
-        : await createCvAction(data);
-      if (!result.success) {
-        myToast.error(result.error);
-        return null;
-      }
-      const saved = result.data;
-      reset(saved);
-      myToast.success(t("toasts.saved"));
-      return saved;
-    } finally {
-      setSaving(false);
+      setValue("photoUrl", await resizeImageToDataUrl(file), { shouldDirty: true });
+    } catch {
+      myToast.error(t("toasts.photoError"));
     }
-  }, [id, reset]);
+  };
 
-  const handleSave = async (param: "done" | "save") => {
-    if (param === "done" && !user) {
-      setShowAuthModal(true);
+  /** Renvoie à la première étape contenant une erreur ; true si tout est valide. */
+  const validateAll = async (): Promise<boolean> => {
+    if (await trigger()) return true;
+    const firstInvalid = Object.entries(STEP_FIELDS).find(([, fields]) =>
+      fields.some((f) => getFieldState(f).invalid)
+    );
+    if (firstInvalid) goToStep(Number(firstInvalid[0]));
+    myToast.error(t("toasts.incomplete"));
+    return false;
+  };
+
+  const handleSave = async (mode: SaveMode, authenticated = isAuthenticated) => {
+    if (!authenticated) {
+      setPendingSave(mode);
       return;
     }
-    if (!isDirty) {
-      if (param === "done") {
-        if (!cvData.completed) {
-          const dataToSave = { ...getValues(), currentStep: 7, completed: true };
-          await saveCV(dataToSave, id);
+    if (mode === "save" && cvId && !isDirty) {
+      myToast.warning(t("toasts.noChanges"));
+      return;
+    }
+    if (mode === "done" && !(await validateAll())) return;
+
+    const data: CVData = {
+      ...getValues(),
+      currentStep: mode === "done" ? LAST_STEP : currentStep,
+      completed: mode === "done" || getValues("completed") === true,
+    };
+
+    setSaving(true);
+    try {
+      const result = cvId ? await updateCvAction(cvId, data) : await createCvAction(data);
+      if (!result.success) {
+        if (result.code === "UNAUTHORIZED") {
+          setIsAuthenticated(false);
+          setPendingSave(mode);
+        } else {
+          myToast.error(result.error);
         }
+        return;
+      }
+      reset(result.data);
+      myToast.success(t("toasts.saved"));
+
+      if (!cvId && result.data.id) {
+        // Le CV existe désormais : les sauvegardes suivantes doivent le mettre à jour, pas en créer un nouveau.
+        setCvId(result.data.id);
+        window.history.replaceState(null, "", pathname.replace(/\/new$/, `/${result.data.id}`));
+      }
+
+      if (mode === "done") {
         router.push("/dashboard");
         router.refresh();
       } else {
-        myToast.warning(t("toasts.noChanges"));
+        setSaved(true);
+        setTimeout(() => setSaved(false), 2000);
       }
-      return;
-    }
-    const dataToSave = { ...getValues(), currentStep, completed: param === "done" || cvData.completed === true };
-    if (param === "done") {
-      dataToSave.currentStep = 7;
-    }
-    const savedCv = await saveCV(dataToSave, id);
-    if (savedCv) {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-      if (param === "done") {
-        router.push("/dashboard");
-        router.refresh();
-      }
+    } finally {
+      setSaving(false);
     }
   };
 
-
-  const progress = Math.round((currentStep / 7) * 100);
+  const progress = Math.round((currentStep / LAST_STEP) * 100);
 
   return (
     <>
-      <div className="min-h-screen bg-background flex flex-col">
-        <header className="border-b border-border bg-background px-6 h-14 flex items-center justify-between shrink-0">
+      <div className="h-dvh bg-background flex flex-col">
+        <header className="border-b border-border bg-background px-2 sm:px-6 h-14 flex items-center justify-between shrink-0">
           <Button type="button" variant="ghost" onClick={() => router.push("/dashboard")} className="flex items-center gap-2.5">
             <div className="h-8 w-8 rounded-lg bg-[hsl(235,40%,14%)] flex items-center justify-center">
               <FileText className="h-4 w-4 text-white" />
@@ -207,37 +185,70 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
             type="button"
             variant="ghost"
             onClick={() => router.push("/dashboard")}
+            aria-label={t("backToDashboard")}
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            {t("backToDashboard")}
+            <span className="hidden sm:inline">{t("backToDashboard")}</span>
           </Button>
         </header>
 
+        {/* Mobile : étapes compactes + progression */}
+        <div className="md:hidden border-b border-border bg-[hsl(235,40%,14%)] px-4 py-3 shrink-0">
+          <div className="flex items-center justify-between gap-3 mb-2.5">
+            <span className="text-sm font-semibold text-white truncate">
+              {t(`steps.${currentStep - 1}.label`)}
+            </span>
+            <span className="text-xs font-bold text-white/60 shrink-0">{currentStep} / {LAST_STEP}</span>
+          </div>
+          <div className="flex gap-1.5">
+            {steps.map((step) => {
+              const isReachable = step.num <= furthestStep;
+              return (
+                <button
+                  key={step.num}
+                  type="button"
+                  disabled={!isReachable}
+                  onClick={() => setCurrentStep(step.num)}
+                  aria-label={t(`steps.${step.num - 1}.label`)}
+                  aria-current={currentStep === step.num ? "step" : undefined}
+                  className={`h-1.5 flex-1 rounded-full transition-colors ${step.num <= currentStep
+                    ? "bg-primary"
+                    : isReachable
+                      ? "bg-white/40"
+                      : "bg-white/10"
+                    }`}
+                />
+              );
+            })}
+          </div>
+        </div>
+
         <div className="flex flex-1 overflow-hidden">
-          <aside className="w-56 bg-[hsl(235,40%,14%)] flex flex-col shrink-0">
+          <aside className="hidden md:flex w-56 bg-[hsl(235,40%,14%)] flex-col shrink-0">
             <nav className="flex-1 py-6 px-3 space-y-1">
               {steps.map((step) => {
                 const isActive = currentStep === step.num;
-                const isPast = currentStep > step.num;
+                const isReachable = step.num <= furthestStep;
+                const isPast = step.num < furthestStep && !isActive;
                 const StepIcon = step.icon;
                 return (
                   <Button
                     type="button"
                     variant="ghost"
                     key={step.num}
-                    onClick={() => step.num <= currentStep ? setCurrentStep(step.num) : undefined}
-                    disabled={step.num > currentStep}
+                    onClick={() => isReachable && setCurrentStep(step.num)}
+                    disabled={!isReachable}
                     className={`w-full flex items-center justify-start gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${isActive
                       ? 'bg-white/10 text-white font-semibold'
-                      : isPast
+                      : isReachable
                         ? 'text-white/60 hover:text-white hover:bg-white/5 cursor-pointer'
                         : 'text-white/25 cursor-not-allowed'
                       }`}
                   >
                     <div className={`h-7 w-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${isActive
                       ? 'bg-primary text-primary-foreground'
-                      : isPast
+                      : isReachable
                         ? 'bg-white/15 text-white/80'
                         : 'bg-white/5 text-white/30'
                       }`}>
@@ -264,67 +275,34 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
 
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="flex-1 overflow-y-auto">
-              <div className="max-w-5xl mx-auto w-full px-8 lg:px-12 py-10 flex gap-8">
+              <div className="max-w-5xl mx-auto w-full px-4 sm:px-8 lg:px-12 py-6 sm:py-10 flex gap-8">
                 <FormProvider {...form}>
                   <div className="flex-1 min-w-0">
-                    <div className="mb-8">
-                      <div className="flex items-center gap-2 mb-2">
+                    <div className="mb-6 sm:mb-8">
+                      <div className="hidden md:flex items-center gap-2 mb-2">
                         <span className="text-xs font-semibold text-primary bg-primary/10 px-2.5 py-1 rounded-lg">
                           {t("stepBadge", { step: currentStep })}
                         </span>
                       </div>
-                      <h1 className="text-2xl font-black tracking-tight">{t(`stepTitles.${currentStep}.title`)}</h1>
+                      <h1 className="text-xl sm:text-2xl font-black tracking-tight">{t(`stepTitles.${currentStep}.title`)}</h1>
                       <p className="text-muted-foreground text-sm mt-1">{t(`stepTitles.${currentStep}.subtitle`)}</p>
                     </div>
 
-                    {/* Step 1: Coordonnées */}
                     {currentStep === 1 && (
-                      <Step1Coordonnees
-                        handlePhotoUpload={handlePhotoUpload}
-                        fileInputRef={fileInputRef}
-                      />
+                      <Step1Coordonnees handlePhotoUpload={handlePhotoUpload} fileInputRef={fileInputRef} />
                     )}
-
-                    {/* Step 2: Expériences */}
                     {currentStep === 2 && <Step2Experiences />}
-
-                    {/* Step 3: Formation */}
                     {currentStep === 3 && <Step3Formation />}
-
-                    {/* Step 4: Compétences */}
                     {currentStep === 4 && <Step4Competences />}
-
-                    {/* Step 5: Résumé */}
                     {currentStep === 5 && <Step5Resume />}
-
-                    {/* Step 6: Langues */}
                     {currentStep === 6 && <Step6Langues />}
-
-                    {/* Step 7: Finaliser */}
-                    {currentStep === 7 && <Step7Finaliser templates={TEMPLATES} />}
+                    {currentStep === 7 && <Step7Finaliser />}
                   </div>
                 </FormProvider>
 
-                {/* Preview mini */}
-                <div className="hidden lg:flex flex-col shrink-0 sticky top-0 self-start" style={{ width: PREVIEW_CONTAINER_WIDTH }}>
-                  <div
-                    ref={previewContainerRef}
-                    className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden flex items-start justify-start"
-                    style={{ width: PREVIEW_CONTAINER_WIDTH, height: PREVIEW_CONTAINER_HEIGHT }}
-                  >
-                    <div
-                      style={{
-                        transform: `scale(${previewScale})`,
-                        transformOrigin: 'top left',
-                        width: CV_PREVIEW_WIDTH,
-                        height: CV_PREVIEW_HEIGHT,
-                        flexShrink: 0,
-                        pointerEvents: 'none',
-                      }}
-                    >
-                      <CVPreview data={cvData} />
-                    </div>
-                  </div>
+                {/* Aperçu (desktop) */}
+                <div className="hidden lg:flex flex-col shrink-0 sticky top-0 self-start w-[350px]">
+                  <ScaledPreview data={cvData} className="rounded-2xl border border-border shadow-sm" />
                   <Button
                     variant="outline"
                     className="mt-3 w-full gap-2 rounded-xl"
@@ -337,43 +315,60 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
               </div>
             </div>
 
-            <div className="border-t border-border bg-card shrink-0">
-              <div className="max-w-5xl mx-auto px-8 lg:px-12 py-3.5 flex items-center justify-between">
+            <div className="border-t border-border bg-card shrink-0 pb-[env(safe-area-inset-bottom)]">
+              <div className="max-w-5xl mx-auto px-3 sm:px-8 lg:px-12 py-3 sm:py-3.5 flex items-center justify-between gap-2">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => currentStep > 1 ? setCurrentStep(currentStep - 1) : router.push("/dashboard")}
-                  className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center gap-1.5 px-2 sm:px-4 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  {currentStep > 1 ? t("footer.previous") : t("footer.dashboard")}
+                  <span className="hidden sm:inline">{currentStep > 1 ? t("footer.previous") : t("footer.dashboard")}</span>
                 </Button>
-                <div className="flex items-center gap-3">
-                  {/* {!stepValid && currentStep < 7 && (
-                    <p className="text-xs text-destructive font-medium">Champs obligatoires manquants</p>
-                  )} */}
-                  <Button variant="outline" size="sm" className="rounded-xl gap-1.5" onClick={() => handleSave('save')} disabled={saving}>
-                    {saved ? <><Check className="h-3.5 w-3.5" /> {t("footer.saved")}</> : saving ? "..." : <><Save className="h-3.5 w-3.5" /> {t("footer.save")}</>}
+                <div className="flex items-center gap-2 sm:gap-3">
+                  {/* Aperçu (mobile / tablette : pas de place pour l'aperçu latéral) */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="lg:hidden rounded-xl gap-1.5"
+                    onClick={() => setShowMobilePreview(true)}
+                    aria-label={t("previewButton")}
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">{t("previewButton")}</span>
                   </Button>
-                  {currentStep < 7 ? (
-                    <Button
-                      size="sm"
-                      className="rounded-xl gap-1.5 disabled:opacity-40"
-                      onClick={() => setCurrentStep(currentStep + 1)}
-                    // disabled={!stepValid}
-                    >
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl gap-1.5"
+                    onClick={() => handleSave("save")}
+                    disabled={saving}
+                    aria-label={t("footer.save")}
+                  >
+                    {saved ? <Check className="h-3.5 w-3.5" /> : <Save className="h-3.5 w-3.5" />}
+                    <span className="hidden sm:inline">{saved ? t("footer.saved") : saving ? "..." : t("footer.save")}</span>
+                  </Button>
+                  {currentStep < LAST_STEP ? (
+                    <Button size="sm" className="rounded-xl gap-1.5" onClick={() => goToStep(currentStep + 1)}>
                       {t("footer.next")}
                       <ChevronRight className="h-3.5 w-3.5" />
                     </Button>
                   ) : (
                     <>
-                      <Button variant="outline" size="sm" className="rounded-xl gap-1.5"
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="rounded-xl gap-1.5"
                         onClick={handleDownloadPDF}
-                        disabled={downloading}>
+                        disabled={exporting}
+                        aria-label={t("footer.pdf")}
+                      >
                         <Download className="h-3.5 w-3.5" />
-                        {downloading ? "..." : t("footer.pdf")}
+                        <span className="hidden sm:inline">{exporting ? "..." : t("footer.pdf")}</span>
                       </Button>
-                      <Button size="sm" className="rounded-xl gap-1.5" onClick={() => handleSave('done')}>
+                      <Button size="sm" className="rounded-xl gap-1.5" onClick={() => handleSave("done")} disabled={saving}>
                         {t("footer.finish")}
                         <Check className="h-3.5 w-3.5" />
                       </Button>
@@ -386,20 +381,36 @@ const CVNew = ({ initialCvData, initialCvId, user }: CVNewProps) => {
         </div>
       </div>
 
-      <div style={{ position: 'fixed', left: '-9999px', top: 0, width: '595px' }}>
-        <div ref={pdfRef} style={{ width: '595px', fontFamily: 'Inter, sans-serif' }}>
-          <CVPreview data={cvData} forPdf />
-        </div>
-      </div> 
+      <Dialog open={showMobilePreview} onOpenChange={setShowMobilePreview}>
+        <DialogContent className="lg:hidden w-[calc(100vw-2rem)] max-w-md max-h-[90dvh] overflow-y-auto p-4 rounded-2xl">
+          <DialogTitle className="text-base font-black tracking-tight">{t("previewButton")}</DialogTitle>
+          <ScaledPreview data={cvData} className="rounded-xl border border-border" />
+          <Button
+            variant="outline"
+            className="w-full gap-2 rounded-xl"
+            onClick={() => {
+              setShowMobilePreview(false);
+              setShowTemplateModal(true);
+            }}
+          >
+            <Layers className="h-4 w-4" />
+            {t("changeTemplate")}
+          </Button>
+        </DialogContent>
+      </Dialog>
+
+      {pdfNode}
 
       <TemplateModal showTemplateModal={showTemplateModal} setShowTemplateModal={setShowTemplateModal} cvData={cvData} setValue={setValue} />
 
       <AuthModal
-        open={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
+        open={pendingSave !== null}
+        onClose={() => setPendingSave(null)}
         onSuccess={() => {
-          setShowAuthModal(false);
-          handleSave("done");
+          const mode = pendingSave;
+          setPendingSave(null);
+          setIsAuthenticated(true);
+          if (mode) handleSave(mode, true);
         }}
         context="finalize"
       />

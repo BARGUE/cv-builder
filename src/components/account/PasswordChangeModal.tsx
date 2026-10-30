@@ -12,6 +12,7 @@ import { Eye, EyeOff, Lock } from "lucide-react";
 import { myToast } from "@/src/components/ui/toast";
 import { updatePasswordAction } from "@/src/app/[locale]/actions/profile";
 import type { PasswordChangeModalProps } from "@/src/components/account/types";
+import { MIN_PASSWORD_LENGTH } from "@/src/lib/validations/cv";
 
 const PasswordChangeModal = ({ onUnauthorized }: PasswordChangeModalProps) => {
   const t = useTranslations("passwordModal");
@@ -23,7 +24,7 @@ const PasswordChangeModal = ({ onUnauthorized }: PasswordChangeModalProps) => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (newPassword.length < 6) {
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
       myToast.error(t("toasts.minLength"));
       return;
     }
@@ -36,7 +37,7 @@ const PasswordChangeModal = ({ onUnauthorized }: PasswordChangeModalProps) => {
     try {
       const result = await updatePasswordAction(newPassword);
       if (!result.success) {
-        if (result.error === "Non authentifié" && onUnauthorized) {
+        if (result.code === "UNAUTHORIZED" && onUnauthorized) {
           onUnauthorized();
           return;
         }

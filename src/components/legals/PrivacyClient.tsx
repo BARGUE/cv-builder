@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Link } from "@/src/i18n/navigation";
 import { Header } from "@/src/components/home/Header";
 import { Footer } from "@/src/components/home/Footer";
 import { motion } from "framer-motion";
@@ -133,9 +134,9 @@ export default function PrivacyClient() {
                         <Mail className="h-8 w-8 text-primary mx-auto mb-4" />
                         <h3 className="text-xl font-bold text-white mb-2">{t("ctaTitle")}</h3>
                         <p className="text-white/60 text-sm mb-6">{t("ctaDescription")}</p>
-                        <a href="/contact" className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl text-sm font-semibold transition-colors">
+                        <Link href="/contact" className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-xl text-sm font-semibold transition-colors">
                             {t("ctaButton")}
-                        </a>
+                        </Link>
                     </div>
                 </motion.section>
             </InView>

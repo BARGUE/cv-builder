@@ -1,15 +1,7 @@
-import type { CVData, CVListItem } from "@/src/types/cv";
+import { ApiError, apiRequest } from "@/src/services/http";
+import { normalizeCVData, type CVData, type CVListItem } from "@/src/types/cv";
 
-const AUTH_API_URL = process.env.AUTH_API_URL;
-
-function getBaseUrl(): string {
-    if (!AUTH_API_URL) {
-        throw new Error("Configuration serveur manquante (AUTH_API_URL)");
-    }
-    return AUTH_API_URL.replace(/\/$/, "");
-}
-
-function mapApiItemToCVListItem(item: CVData): CVListItem {
+function toListItem(item: CVData): CVListItem {
     return {
         id: item.id ?? "",
         title: item.title ?? "",
@@ -22,7 +14,7 @@ function mapApiItemToCVListItem(item: CVData): CVListItem {
     };
 }
 
-export function buildSavePayload(data: CVData): Record<string, unknown> {
+function toSavePayload(data: CVData) {
     return {
         title: data.title || "Mon CV",
         template: data.template,
@@ -43,86 +35,47 @@ export function buildSavePayload(data: CVData): Record<string, unknown> {
     };
 }
 
-export async function getCvApi(cvId: string, accessToken: string): Promise<CVData | null> {
-    const baseUrl = getBaseUrl();
-    const res = await fetch(`${baseUrl}/cvs/${cvId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        cache: "no-store",
-    });
-    if (!res.ok) return null;
-    const api = (await res.json()) as CVData;
-    return api;
+/** Retourne null si le CV n'existe pas (ou n'appartient pas à l'utilisateur). */
+export async function getCvApi(cvId: string, token: string): Promise<CVData | null> {
+    try {
+        return normalizeCVData(await apiRequest<CVData>(`/cvs/${encodeURIComponent(cvId)}`, { token }));
+    } catch (e) {
+        if (e instanceof ApiError && (e.status === 404 || e.status === 403 || e.status === 400)) return null;
+        throw e;
+    }
 }
 
-export async function createCvApi(
-    payload: CVData,
-    accessToken: string
-): Promise<CVData | null> {
-    const baseUrl = getBaseUrl();
-    const body = buildSavePayload(payload);
-    const res = await fetch(`${baseUrl}/cvs`, {
+export async function createCvApi(payload: CVData, token: string): Promise<CVData> {
+    const cv = await apiRequest<CVData>("/cvs", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(body),
+        token,
+        body: toSavePayload(payload),
+        fallbackError: "Erreur lors de la création",
     });
-    if (!res.ok) {
-        const errBody = await res.json().catch(() => ({}));
-        const msg =
-            (errBody as { error?: string }).error ??
-            (errBody as { message?: string }).message ??
-            "Erreur lors de la création";
-        throw new Error(msg);
-    }
-    const api = (await res.json()) as CVData;
-    return api;
+    return normalizeCVData(cv);
 }
 
-export async function updateCvApi(
-    cvId: string,
-    payload: CVData,
-    accessToken: string
-): Promise<CVData | null> {
-    const baseUrl = getBaseUrl();
-    const body = buildSavePayload(payload);
-    const res = await fetch(`${baseUrl}/cvs/${cvId}`, {
+export async function updateCvApi(cvId: string, payload: CVData, token: string): Promise<CVData> {
+    const cv = await apiRequest<CVData>(`/cvs/${encodeURIComponent(cvId)}`, {
         method: "PATCH",
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(body),
+        token,
+        body: toSavePayload(payload),
+        fallbackError: "Erreur lors de la mise à jour",
     });
-    if (!res.ok) {
-        const errBody = await res.json().catch(() => ({}));
-        const msg =
-            (errBody as { error?: string }).error ??
-            (errBody as { message?: string }).message ??
-            "Erreur lors de la mise à jour";
-        throw new Error(msg);
-    }
-    const api = (await res.json()) as CVData;
-    return api;
+    return normalizeCVData(cv);
 }
 
-export async function listCvsApi(accessToken: string): Promise<CVListItem[]> {
-    const baseUrl = getBaseUrl();
-    const res = await fetch(`${baseUrl}/cvs`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-        cache: "no-store",
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.map((item: CVData) => mapApiItemToCVListItem(item)).sort((a: CVListItem, b: CVListItem) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+export async function listCvsApi(token: string): Promise<CVListItem[]> {
+    const data = await apiRequest<CVData[]>("/cvs", { token });
+    return (Array.isArray(data) ? data : [])
+        .map(toListItem)
+        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 }
 
-export async function deleteCvApi(cvId: string, accessToken: string): Promise<boolean> {
-    const baseUrl = getBaseUrl();
-    const res = await fetch(`${baseUrl}/cvs/${cvId}`, {
+export async function deleteCvApi(cvId: string, token: string): Promise<void> {
+    await apiRequest<void>(`/cvs/${encodeURIComponent(cvId)}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${accessToken}` },
+        token,
+        fallbackError: "Erreur lors de la suppression",
     });
-    return res.ok;
 }

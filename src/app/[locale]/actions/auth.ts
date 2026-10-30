@@ -1,74 +1,41 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { clearSessionCookie, setSessionCookie } from "@/src/lib/auth";
+import { runAction } from "@/src/lib/action";
 import { loginApi, registerApi } from "@/src/services/auth/api";
 import type { AuthCredentials } from "@/src/services/auth/types";
 import type { ActionResult } from "@/src/types/api";
 
-export async function loginAction(
-  credentials: AuthCredentials
-): Promise<ActionResult<void>> {
-  const trimmedEmail = (credentials.email ?? "").trim();
-  if (!trimmedEmail || !credentials.password) {
-    return { success: false, error: "Email et mot de passe requis" };
+export async function loginAction(credentials: AuthCredentials): Promise<ActionResult> {
+  const t = await getTranslations("serverErrors");
+  const email = (credentials.email ?? "").trim();
+  if (!email || !credentials.password) {
+    return { success: false, error: t("authEmailPasswordRequired") };
   }
-  try {
-    const result = await loginApi({
-      email: trimmedEmail,
-      password: credentials.password,
-    });
-    const cookieStore = await cookies();
-    cookieStore.set("access_token", result.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24,
-    });
-    return { success: true, data: undefined };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Identifiants invalides";
-    return { success: false, error: message };
-  }
+  return runAction(async () => {
+    await setSessionCookie(await loginApi({ email, password: credentials.password }));
+  }, t("invalidCredentials"));
 }
 
-export async function registerAction(
-  credentials: AuthCredentials
-): Promise<ActionResult<void>> {
-  const trimmedEmail = (credentials.email ?? "").trim();
+export async function registerAction(credentials: AuthCredentials): Promise<ActionResult> {
+  const t = await getTranslations("serverErrors");
+  const email = (credentials.email ?? "").trim();
   const firstName = (credentials.firstName ?? "").trim();
   const lastName = (credentials.lastName ?? "").trim();
-  if (!trimmedEmail || !credentials.password) {
-    return { success: false, error: "Email et mot de passe requis" };
+  if (!email || !credentials.password) {
+    return { success: false, error: t("authEmailPasswordRequired") };
   }
   if (!firstName || !lastName) {
-    return { success: false, error: "Prénom et nom requis pour l'inscription" };
+    return { success: false, error: t("authNameRequiredRegister") };
   }
-  try {
-    const result = await registerApi({
-      email: trimmedEmail,
-      password: credentials.password,
-      firstName,
-      lastName,
-    });
-    const cookieStore = await cookies();
-    cookieStore.set("access_token", result.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24,
-    });
-    return { success: true, data: undefined };
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Inscription refusée";
-    return { success: false, error: message };
-  }
+  return runAction(async () => {
+    await setSessionCookie(await registerApi({ email, password: credentials.password, firstName, lastName }));
+  }, t("registrationDenied"));
 }
 
 export async function logoutAction(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.set("access_token", "", { path: "/", maxAge: 0 });
+  await clearSessionCookie();
   redirect("/");
 }

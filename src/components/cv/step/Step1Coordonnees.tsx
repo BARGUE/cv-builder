@@ -28,7 +28,7 @@ export function Step1Coordonnees({ handlePhotoUpload, fileInputRef }: Step1Coord
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+      <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4">
         <div className="flex items-center gap-3 mb-2">
           <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
             <User className="h-4 w-4 text-primary" />
@@ -67,7 +67,7 @@ export function Step1Coordonnees({ handlePhotoUpload, fileInputRef }: Step1Coord
                 variant="ghost"
                 size="sm"
                 className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
-                onClick={() => setValue("photoUrl", "")}
+                onClick={() => setValue("photoUrl", "", { shouldDirty: true })}
               >
                 <Trash2 className="h-3.5 w-3.5 mr-1.5" />
                 {tCommon("delete")}
@@ -75,7 +75,7 @@ export function Step1Coordonnees({ handlePhotoUpload, fileInputRef }: Step1Coord
             )}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-sm font-medium">{t("step1.fullName")}</Label>
             <ValidatedField isValid={fullNameValid.isValid} error={fullNameValid.error}>
@@ -105,14 +105,14 @@ export function Step1Coordonnees({ handlePhotoUpload, fileInputRef }: Step1Coord
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
+      <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4">
         <div className="flex items-center gap-3 mb-2">
           <div className="h-8 w-8 rounded-xl bg-primary/10 flex items-center justify-center">
             <Briefcase className="h-4 w-4 text-primary" />
           </div>
           <span className="text-sm font-bold tracking-tight">{t("step1.contact")}</span>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-sm font-medium">{t("step1.phone")}</Label>
             <ValidatedField isValid={phoneValid.isValid} error={phoneValid.error}>
